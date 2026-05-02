@@ -9,7 +9,7 @@ type GameState = "menu" | "playing" | "over";
 type PlayMode = "tournament" | "demo" | null;
 
 interface Bullet { x: number; y: number; vy: number; charId: string }
-interface Zombie { x: number; y: number; w: number; h: number; speed: number; hp: number; flash: number }
+interface Zombie { x: number; y: number; w: number; h: number; speed: number; hp: number; flash: number; phase: number }
 interface Particle { x: number; y: number; vx: number; vy: number; life: number; maxLife: number; r: number; color: string }
 interface Bubble { x: number; y: number; r: number; vy: number; alpha: number }
 
@@ -556,21 +556,55 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
     if (Math.random() < spawnChance) {
       const sz = 72 + Math.random() * 20;
       const speed = (4.0 + Math.random() * 3.0) * s.diffMult;
-      s.zombies.push({ x: Math.random() * (CW - sz), y: -sz, w: sz, h: sz, speed, hp: 1, flash: 0 });
+      s.zombies.push({ x: Math.random() * (CW - sz), y: -sz, w: sz, h: sz, speed, hp: 1, flash: 0, phase: Math.random() * Math.PI * 2 });
       if (Math.random() < 0.3) playZombieMoan();
     }
 
     for (let i = s.zombies.length - 1; i >= 0; i--) {
-      s.zombies[i].y += s.zombies[i].speed * dt;
-      if (s.zombies[i].flash > 0) {
-        ctx.globalAlpha = 0.5;
-        ctx.drawImage(zombieImg.current, s.zombies[i].x, s.zombies[i].y, s.zombies[i].w, s.zombies[i].h);
-        ctx.globalAlpha = 1;
-        s.zombies[i].flash--;
-      } else {
-        ctx.drawImage(zombieImg.current, s.zombies[i].x, s.zombies[i].y, s.zombies[i].w, s.zombies[i].h);
+      const z = s.zombies[i];
+      z.y += z.speed * dt;
+
+      const t = performance.now() / 1000;
+      const sway   = Math.sin(t * 2.8 + z.phase) * 5;          // side wobble ±5px
+      const bob    = Math.sin(t * 4.0 + z.phase) * 2.5;         // up/down bob ±2.5px
+      const tilt   = Math.sin(t * 2.8 + z.phase) * 0.13;        // lean with sway
+      const scale  = 1 + Math.sin(t * 3.2 + z.phase) * 0.04;   // breathing pulse ±4%
+
+      const drawX = z.x + sway;
+      const drawY = z.y + bob;
+      const cx    = drawX + z.w / 2;
+      const cy    = drawY + z.h / 2;
+      const sw    = z.w * scale;
+      const sh    = z.h * scale;
+
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(tilt);
+
+      // green glow aura
+      const aura = ctx.createRadialGradient(0, 0, sw * 0.2, 0, 0, sw * 0.72);
+      aura.addColorStop(0, "rgba(60,255,80,0.18)");
+      aura.addColorStop(1, "rgba(0,180,0,0)");
+      ctx.fillStyle = aura;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, sw * 0.72, sh * 0.72, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // drop shadow on ground
+      ctx.fillStyle = "rgba(0,40,0,0.35)";
+      ctx.beginPath();
+      ctx.ellipse(0, sh * 0.46, sw * 0.38, sh * 0.1, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      if (z.flash > 0) {
+        ctx.globalAlpha = 0.45;
+        z.flash--;
       }
-      if (s.zombies[i].y > CH + 10) s.zombies.splice(i, 1);
+      ctx.drawImage(zombieImg.current, -sw / 2, -sh / 2, sw, sh);
+      ctx.globalAlpha = 1;
+      ctx.restore();
+
+      if (z.y > CH + 10) s.zombies.splice(i, 1);
     }
 
     // Bullets
