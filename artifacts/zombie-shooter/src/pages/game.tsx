@@ -643,16 +643,24 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
       }
       ctx.restore();
 
-      // Magic staff glow flash when shooting
+      // Muzzle flash when shooting — colour matches current character
       if (performance.now() - s.lastShot < 120) {
         const flashX = dir === 1 ? sh.x + sh.w * 0.72 : sh.x + sh.w * 0.28;
         const flashY = sh.y + sh.h * 0.1;
+        const charId = CHARACTERS[selectedCharRef.current]?.id ?? "og";
+        const flashColors: Record<string, [string, string, string]> = {
+          og:    ["rgba(255,180,255,1)", "rgba(200,80,255,0.7)",  "rgba(120,0,200,0)"],
+          stone: ["rgba(230,230,230,1)", "rgba(150,150,150,0.7)", "rgba(60,60,60,0)"],
+          fire:  ["rgba(255,255,160,1)", "rgba(255,120,0,0.8)",   "rgba(180,0,0,0)"],
+          squad: ["rgba(255,255,255,1)", "rgba(180,100,255,0.7)", "rgba(255,80,180,0)"],
+        };
+        const [c0, c1, c2] = flashColors[charId] ?? flashColors.og;
         ctx.save();
         ctx.globalAlpha = 0.9;
         const flash = ctx.createRadialGradient(flashX, flashY, 0, flashX, flashY, 20);
-        flash.addColorStop(0, "rgba(255,180,255,1)");
-        flash.addColorStop(0.5, "rgba(200,80,255,0.7)");
-        flash.addColorStop(1, "rgba(120,0,200,0)");
+        flash.addColorStop(0, c0);
+        flash.addColorStop(0.5, c1);
+        flash.addColorStop(1, c2);
         ctx.fillStyle = flash;
         ctx.beginPath();
         ctx.arc(flashX, flashY, 20, 0, Math.PI * 2);
