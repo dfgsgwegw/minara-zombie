@@ -25,16 +25,11 @@ export default function App() {
     setRoute(getRoute());
   }
 
-  if (!loggedIn) {
-    return (
-      <LoginPage
-        onLogin={() => setLoggedIn(true)}
-        adminMode={route === "admin"}
-      />
-    );
-  }
-
+  // Admin always requires login
   if (route === "admin") {
+    if (!loggedIn) {
+      return <LoginPage onLogin={() => setLoggedIn(true)} adminMode={true} />;
+    }
     const user = getAuth();
     if (!user?.isAdmin) {
       return (
@@ -53,8 +48,11 @@ export default function App() {
     return <AdminPage onBack={() => navigate("/")} />;
   }
 
+  // Game is always visible — login lives in the sidebar
   return (
     <GamePage
+      loggedIn={loggedIn}
+      onLogin={() => setLoggedIn(true)}
       onLogout={() => {
         setLoggedIn(false);
         navigate("/");

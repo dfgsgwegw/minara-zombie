@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { api, Tournament, LeaderboardEntry } from "@/lib/api";
-import { getAuth, clearAuth } from "@/lib/auth";
+import { getAuth, clearAuth, saveAuth } from "@/lib/auth";
 import { detectDevTools } from "@/lib/anticheats";
 
-interface Props { onLogout: () => void }
+interface Props { onLogout: () => void; loggedIn?: boolean; onLogin?: () => void; }
 
 type GameState = "menu" | "playing" | "over";
 
@@ -185,7 +185,7 @@ function LiveLeaderboard({ entries, myUsername, tournament }: {
 }
 
 /* ── Main Game Page ─────────────────────────────────────────────── */
-export default function GamePage({ onLogout }: Props) {
+export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [gameState, setGameState] = useState<GameState>("menu");
   const [score, setScore] = useState(0);
@@ -197,6 +197,12 @@ export default function GamePage({ onLogout }: Props) {
   const [submitted, setSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+
+  // Sidebar login form state (used when not logged in)
+  const [loginUsername, setLoginUsername] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+  const [loginError, setLoginError] = useState("");
+  const [loginLoading, setLoginLoading] = useState(false);
   const [devtoolsWarning, setDevtoolsWarning] = useState(false);
 
   const sessionTokenRef = useRef<string | null>(null);
@@ -536,6 +542,21 @@ export default function GamePage({ onLogout }: Props) {
     gs.current.keys.left = false; gs.current.keys.right = false;
   }
 
+  async function handleSidebarLogin(e: React.FormEvent) {
+    e.preventDefault();
+    setLoginError("");
+    setLoginLoading(true);
+    try {
+      const res = await api.login(loginUsername.trim(), loginPassword);
+      saveAuth(res.token, { discordUsername: res.discordUsername, isAdmin: res.isAdmin });
+      onLogin?.();
+    } catch (err: unknown) {
+      setLoginError(err instanceof Error ? err.message : "Login failed");
+    } finally {
+      setLoginLoading(false);
+    }
+  }
+
   async function submitScore() {
     const token = sessionTokenRef.current;
     if (!token) { setSubmitError("No valid session."); return; }
@@ -566,15 +587,21 @@ export default function GamePage({ onLogout }: Props) {
       {/* Header */}
       <div className="flex items-center justify-between px-3 py-2 border-b flex-shrink-0 gap-2"
         style={{ borderColor: "rgba(0,200,255,0.12)", background: "rgba(0,10,20,0.95)" }}>
-        <span className="text-cyan-400 font-bold text-xs truncate min-w-0">{user?.discordUsername}</span>
+        <span className="text-cyan-400 font-bold text-xs truncate min-w-0">
+          {loggedIn ? user?.discordUsername : <span className="text-white/30 italic">Not logged in</span>}
+        </span>
         <h1 className="font-black tracking-widest text-xs sm:text-sm flex-shrink-0"
           style={{ color: "#00d4ff", textShadow: "0 0 12px rgba(0,212,255,0.6)" }}>
-          🌊 PACIFIC POD · ZOMBIE SHOOTER
+          🌊 PACIFIC ZOMBIE FIGHTER
         </h1>
-        <button onClick={() => { clearAuth(); onLogout(); }}
-          className="text-white/30 text-xs hover:text-white/60 transition flex-shrink-0">
-          Logout
-        </button>
+        {loggedIn ? (
+          <button onClick={() => { clearAuth(); onLogout(); }}
+            className="text-white/30 text-xs hover:text-white/60 transition flex-shrink-0">
+            Logout
+          </button>
+        ) : (
+          <span className="text-cyan-400/40 text-xs flex-shrink-0">← login</span>
+        )}
       </div>
 
       {/* Tournament banner */}
@@ -621,16 +648,21 @@ export default function GamePage({ onLogout }: Props) {
                 <div className="relative z-10 rounded-xl p-6 sm:p-10 text-center mx-4 border"
                   style={{ background: "rgba(0,10,25,0.88)", borderColor: "rgba(0,200,255,0.35)", boxShadow: "0 0 40px rgba(0,200,255,0.15)" }}>
                   <p className="text-xs font-bold tracking-widest mb-1" style={{ color: "rgba(0,200,255,0.6)" }}>PACIFIC POD NFT PRESENTS</p>
-                  <h2 className="text-4xl sm:text-5xl font-black tracking-widest mb-1"
-                    style={{ color: "#00d4ff", textShadow: "0 0 30px rgba(0,212,255,0.8)" }}>ZOMBIE</h2>
-                  <h3 className="text-2xl sm:text-3xl font-black text-white tracking-widest mb-5">SHOOTER</h3>
+                  <h2 className="text-3xl sm:text-4xl font-black tracking-widest mb-1"
+                    style={{ color: "#00d4ff", textShadow: "0 0 30px rgba(0,212,255,0.8)" }}>PACIFIC</h2>
+                  <h3 className="text-2xl sm:text-3xl font-black text-white tracking-widest mb-5">ZOMBIE FIGHTER</h3>
                   <p className="text-white/40 text-xs sm:text-sm mb-6">
                     <kbd className="bg-white/10 px-1.5 py-0.5 rounded text-white">A</kbd>{" / "}
                     <kbd className="bg-white/10 px-1.5 py-0.5 rounded text-white">D</kbd>{" "}
                     or arrows to move ·{" "}
-                    <kbd className="bg-white/10 px-1.5 py-0.5 rounded text-white">Click</kbd> to cast
+                    <kbd className="bg-white/10 px-1.5 py-0.5 rounded text-white">Click</kbd> to shoot
                   </p>
-                  {canPlay ? (
+                  {!loggedIn ? (
+                    <div className="text-center">
+                      <div className="text-cyan-400 font-bold text-sm mb-1">Login to Play →</div>
+                      <div className="text-white/30 text-xs">Use the login panel on the right</div>
+                    </div>
+                  ) : canPlay ? (
                     <button onClick={startGame}
                       className="font-black px-8 py-3 rounded text-lg tracking-widest transition uppercase text-black"
                       style={{ background: "linear-gradient(135deg, #00d4ff, #0080ff)", boxShadow: "0 0 30px rgba(0,180,255,0.4)" }}>
@@ -683,9 +715,72 @@ export default function GamePage({ onLogout }: Props) {
           </div>
         </div>
 
-        {/* Leaderboard */}
+        {/* Sidebar — login form when logged out, leaderboard when logged in */}
         <div className="w-44 sm:w-52 flex-shrink-0 min-h-0">
-          <LiveLeaderboard entries={leaderboard} myUsername={user?.discordUsername ?? ""} tournament={tournament} />
+          {!loggedIn ? (
+            <div className="flex flex-col h-full overflow-hidden rounded-lg border border-cyan-500/30" style={{ background: "rgba(0,20,30,0.92)" }}>
+              {/* Login form */}
+              <div className="px-3 py-2 border-b border-cyan-500/20 flex-shrink-0" style={{ background: "rgba(0,60,80,0.5)" }}>
+                <p className="text-cyan-400 font-black tracking-widest text-xs uppercase">🔐 Login to Play</p>
+              </div>
+              <form onSubmit={handleSidebarLogin} className="p-3 space-y-2.5 flex-shrink-0">
+                <div>
+                  <label className="block text-cyan-400/70 text-[10px] font-bold mb-1 tracking-widest uppercase">Discord Username</label>
+                  <input
+                    type="text"
+                    value={loginUsername}
+                    onChange={e => setLoginUsername(e.target.value)}
+                    placeholder="Username"
+                    required
+                    autoComplete="username"
+                    className="w-full bg-black/60 border border-cyan-500/30 text-white placeholder-white/20 rounded px-2 py-1.5 text-xs focus:outline-none focus:border-cyan-400 transition"
+                  />
+                </div>
+                <div>
+                  <label className="block text-cyan-400/70 text-[10px] font-bold mb-1 tracking-widest uppercase">Password</label>
+                  <input
+                    type="password"
+                    value={loginPassword}
+                    onChange={e => setLoginPassword(e.target.value)}
+                    placeholder="••••••••"
+                    required
+                    autoComplete="current-password"
+                    className="w-full bg-black/60 border border-cyan-500/30 text-white placeholder-white/20 rounded px-2 py-1.5 text-xs focus:outline-none focus:border-cyan-400 transition"
+                  />
+                </div>
+                {loginError && (
+                  <p className="text-red-400 text-[10px] bg-red-900/20 border border-red-500/20 rounded p-1.5">{loginError}</p>
+                )}
+                <button
+                  type="submit"
+                  disabled={loginLoading}
+                  className="w-full text-black font-black py-2 rounded text-xs tracking-widest uppercase transition disabled:opacity-50"
+                  style={{ background: "linear-gradient(135deg, #00d4ff, #0080ff)" }}
+                >
+                  {loginLoading ? "Logging in..." : "Login"}
+                </button>
+              </form>
+              {/* Mini leaderboard below login */}
+              <div className="flex-1 overflow-y-auto border-t border-cyan-500/15">
+                <div className="px-3 py-1.5 border-b border-cyan-500/15" style={{ background: "rgba(0,40,60,0.4)" }}>
+                  <p className="text-cyan-400/60 text-[10px] font-black tracking-widest uppercase">🌊 Leaderboard</p>
+                </div>
+                {leaderboard.length === 0 ? (
+                  <div className="text-white/20 text-[10px] text-center py-4">🧟 No scores yet</div>
+                ) : leaderboard.map(e => (
+                  <div key={e.discordUsername} className="flex items-center gap-1.5 px-3 py-1.5 border-b border-white/5">
+                    <span className={`text-[10px] w-5 text-center flex-shrink-0 font-black ${RANK_COLOR[e.rank] ?? "text-white/40"}`}>
+                      {RANK_MEDAL[e.rank] ?? `#${e.rank}`}
+                    </span>
+                    <p className="flex-1 min-w-0 text-[10px] text-white/60 truncate">{e.discordUsername}</p>
+                    <span className="text-yellow-400 font-black text-[10px] flex-shrink-0">{e.bestScore}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <LiveLeaderboard entries={leaderboard} myUsername={user?.discordUsername ?? ""} tournament={tournament} />
+          )}
         </div>
       </div>
     </div>

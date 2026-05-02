@@ -43,10 +43,10 @@ export default function LoginPage({ onLogin, adminMode = false }: Props) {
       <div className="absolute inset-0 bg-black/70" />
       <div className="relative z-10 w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-5xl font-black text-green-400 tracking-widest drop-shadow-[0_0_20px_rgba(74,222,128,0.8)] mb-2">
-            ZOMBIE
+          <h1 className="text-4xl font-black text-green-400 tracking-widest drop-shadow-[0_0_20px_rgba(74,222,128,0.8)] mb-1">
+            PACIFIC
           </h1>
-          <h2 className="text-3xl font-black text-white tracking-widest">SHOOTER</h2>
+          <h2 className="text-3xl font-black text-white tracking-widest">ZOMBIE FIGHTER</h2>
           <p className="text-green-400/70 mt-2 tracking-wider text-sm">
             {adminMode ? "ADMIN ACCESS" : "TOURNAMENT"}
           </p>
