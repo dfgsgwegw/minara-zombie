@@ -210,7 +210,7 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
   const sessionTokenRef = useRef<string | null>(null);
 
   const gs = useRef({
-    shooter: { x: CW / 2 - 48, y: CH - 110, w: 96, h: 96, speed: 25 },
+    shooter: { x: CW / 2 - 48, y: CH - 110, w: 96, h: 96, speed: 7 },
     bullets: [] as Bullet[],
     zombies: [] as Zombie[],
     particles: [] as Particle[],
@@ -280,7 +280,7 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
   async function startGame() {
     try { const { sessionToken } = await api.startSession(); sessionTokenRef.current = sessionToken; } catch { return; }
     const s = gs.current;
-    s.shooter = { x: CW / 2 - 48, y: CH - 110, w: 96, h: 96, speed: 25 };
+    s.shooter = { x: CW / 2 - 48, y: CH - 110, w: 96, h: 96, speed: 7 };
     s.bullets = []; s.zombies = []; s.particles = [];
     s.keys = { a: false, d: false, left: false, right: false };
     s.pts = 0; s.hp = 100; s.dead = false; s.frame = 0; s.diffMult = 1; s.screenShake = 0; s.lastShot = 0; s.lastFrameTime = 0;
@@ -294,7 +294,7 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
   function startDemoGame() {
     sessionTokenRef.current = null;
     const s = gs.current;
-    s.shooter = { x: CW / 2 - 48, y: CH - 110, w: 96, h: 96, speed: 25 };
+    s.shooter = { x: CW / 2 - 48, y: CH - 110, w: 96, h: 96, speed: 7 };
     s.bullets = []; s.zombies = []; s.particles = [];
     s.keys = { a: false, d: false, left: false, right: false };
     s.pts = 0; s.hp = 100; s.dead = false; s.frame = 0; s.diffMult = 1; s.screenShake = 0; s.lastShot = 0; s.lastFrameTime = 0;
@@ -427,10 +427,10 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
     if (movingRight && s.shooter.x < CW - s.shooter.w) { s.shooter.x += s.shooter.speed * dt; s.lastDir = 1; }
 
     // Zombies
-    const spawnChance = 0.095 + s.diffMult * 0.030;
+    const spawnChance = 0.03 + s.diffMult * 0.005;
     if (Math.random() < spawnChance) {
       const sz = 72 + Math.random() * 20;
-      const speed = (7.0 + Math.random() * 4.5) * s.diffMult;
+      const speed = (2.0 + Math.random() * 1.5) * s.diffMult;
       s.zombies.push({ x: Math.random() * (CW - sz), y: -sz, w: sz, h: sz, speed, hp: 1, flash: 0 });
       if (Math.random() < 0.3) playZombieMoan();
     }
