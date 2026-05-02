@@ -574,7 +574,7 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
 
           s.zombies.splice(zi, 1);
           s.bullets.splice(bi, 1);
-          s.pts += 10;
+          s.pts += 1;
           setScore(s.pts);
           continue outer;
         }
