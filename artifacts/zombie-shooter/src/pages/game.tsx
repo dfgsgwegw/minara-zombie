@@ -6,6 +6,7 @@ import { detectDevTools } from "@/lib/anticheats";
 interface Props { onLogout: () => void; loggedIn?: boolean; onLogin?: () => void; }
 
 type GameState = "menu" | "playing" | "over";
+type PlayMode = "tournament" | "demo" | null;
 
 interface Bullet { x: number; y: number; vy: number }
 interface Zombie { x: number; y: number; w: number; h: number; speed: number; hp: number; flash: number }
@@ -204,6 +205,7 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
   const [loginError, setLoginError] = useState("");
   const [loginLoading, setLoginLoading] = useState(false);
   const [devtoolsWarning, setDevtoolsWarning] = useState(false);
+  const [playMode, setPlayMode] = useState<PlayMode>(null);
 
   const sessionTokenRef = useRef<string | null>(null);
 
@@ -282,6 +284,21 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
     s.pts = 0; s.hp = 100; s.dead = false; s.frame = 0; s.diffMult = 1; s.screenShake = 0; s.lastShot = 0;
     setScore(0); setHealth(100);
     setSubmitted(false); setSubmitError(""); setDevtoolsWarning(false);
+    setPlayMode("tournament");
+    setGameState("playing");
+    requestAnimationFrame(loop);
+  }
+
+  function startDemoGame() {
+    sessionTokenRef.current = null;
+    const s = gs.current;
+    s.shooter = { x: CW / 2 - 48, y: CH - 110, w: 96, h: 96, speed: 6 };
+    s.bullets = []; s.zombies = []; s.particles = [];
+    s.keys = { a: false, d: false, left: false, right: false };
+    s.pts = 0; s.hp = 100; s.dead = false; s.frame = 0; s.diffMult = 1; s.screenShake = 0; s.lastShot = 0;
+    setScore(0); setHealth(100);
+    setSubmitted(false); setSubmitError(""); setDevtoolsWarning(false);
+    setPlayMode("demo");
     setGameState("playing");
     requestAnimationFrame(loop);
   }
@@ -493,6 +510,19 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
       ctx.fillText(`⚡ LEVEL ${Math.floor(s.diffMult / 0.25) - 2}`, CW / 2 - 28, 22);
     }
 
+    // Demo mode badge
+    if (playMode === "demo") {
+      ctx.fillStyle = "rgba(0,10,20,0.65)";
+      ctx.beginPath();
+      ctx.roundRect(CW / 2 - 44, CH - 28, 88, 20, 5);
+      ctx.fill();
+      ctx.font = "bold 11px monospace";
+      ctx.fillStyle = "rgba(0,200,255,0.55)";
+      ctx.textAlign = "center";
+      ctx.fillText("🎮 DEMO MODE", CW / 2, CH - 14);
+      ctx.textAlign = "left";
+    }
+
     ctx.restore();
 
     if (s.hp <= 0) { s.dead = true; setScore(s.pts); setGameState("over"); return; }
@@ -657,21 +687,28 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
                     or arrows to move ·{" "}
                     <kbd className="bg-white/10 px-1.5 py-0.5 rounded text-white">Click</kbd> to shoot
                   </p>
-                  {!loggedIn ? (
-                    <div className="text-center">
-                      <div className="text-cyan-400 font-bold text-sm mb-1">Login to Play →</div>
-                      <div className="text-white/30 text-xs">Use the login panel on the right</div>
-                    </div>
-                  ) : canPlay ? (
+                  {/* Tournament / competitive play button */}
+                  {loggedIn && canPlay && (
                     <button onClick={startGame}
-                      className="font-black px-8 py-3 rounded text-lg tracking-widest transition uppercase text-black"
+                      className="font-black px-8 py-3 rounded text-lg tracking-widest transition uppercase text-black mb-3 block w-full"
                       style={{ background: "linear-gradient(135deg, #00d4ff, #0080ff)", boxShadow: "0 0 30px rgba(0,180,255,0.4)" }}>
                       Enter the Deep
                     </button>
-                  ) : (
-                    <div className="text-white/40 text-sm border border-white/10 px-6 py-3 rounded">
-                      {tournamentStatus === "upcoming" ? "Tournament hasn't started yet" : "Waiting for tournament"}
+                  )}
+                  {loggedIn && !canPlay && (
+                    <div className="text-white/40 text-sm border border-white/10 px-6 py-3 rounded mb-3">
+                      {tournamentStatus === "upcoming" ? "Tournament hasn't started yet" : "No active tournament"}
                     </div>
+                  )}
+
+                  {/* Demo mode — always available */}
+                  <button onClick={startDemoGame}
+                    className="font-black px-8 py-2.5 rounded text-base tracking-widest transition uppercase border w-full"
+                    style={{ background: "rgba(255,255,255,0.05)", borderColor: "rgba(0,200,255,0.3)", color: "rgba(0,212,255,0.8)" }}>
+                    🎮 Play Demo
+                  </button>
+                  {!loggedIn && (
+                    <p className="text-white/25 text-xs mt-2">Scores not saved · <span className="text-cyan-500/50">Login</span> to compete</p>
                   )}
                 </div>
               </div>
@@ -693,22 +730,47 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
                     </p>
                   )}
 
-                  {!submitted && !devtoolsWarning && sessionTokenRef.current && (
-                    <button onClick={submitScore} disabled={submitting}
-                      className="w-full disabled:opacity-50 text-black font-black py-2.5 rounded tracking-widest uppercase mb-3 transition"
-                      style={{ background: "linear-gradient(135deg, #00d4ff, #0080ff)" }}>
-                      {submitting ? "Saving..." : "Submit Score"}
-                    </button>
+                  {playMode === "demo" ? (
+                    <div className="mb-4">
+                      <p className="text-white/40 text-xs mb-3 border border-white/10 rounded px-3 py-2">
+                        🎮 Demo mode — score not saved
+                      </p>
+                      {!loggedIn && (
+                        <p className="text-cyan-400/60 text-xs mb-3">Login to compete on the leaderboard!</p>
+                      )}
+                    </div>
+                  ) : (
+                    <>
+                      {!submitted && !devtoolsWarning && sessionTokenRef.current && (
+                        <button onClick={submitScore} disabled={submitting}
+                          className="w-full disabled:opacity-50 text-black font-black py-2.5 rounded tracking-widest uppercase mb-3 transition"
+                          style={{ background: "linear-gradient(135deg, #00d4ff, #0080ff)" }}>
+                          {submitting ? "Saving..." : "Submit Score"}
+                        </button>
+                      )}
+                      {submitted && <p className="text-cyan-400 font-bold mb-3">✓ Score submitted!</p>}
+                      {submitError && <p className="text-red-400 text-xs mb-3">{submitError}</p>}
+                    </>
                   )}
-                  {submitted && <p className="text-cyan-400 font-bold mb-3">✓ Score submitted!</p>}
-                  {submitError && <p className="text-red-400 text-xs mb-3">{submitError}</p>}
 
-                  {canPlay && !devtoolsWarning && (
-                    <button onClick={startGame}
-                      className="w-full bg-white/10 hover:bg-white/20 text-white font-bold py-2 rounded tracking-wider uppercase text-sm transition">
-                      Play Again
+                  {/* Play again buttons */}
+                  {playMode === "demo" ? (
+                    <button onClick={startDemoGame}
+                      className="w-full bg-white/10 hover:bg-white/20 text-white font-bold py-2 rounded tracking-wider uppercase text-sm transition mb-2">
+                      Play Again (Demo)
                     </button>
+                  ) : (
+                    canPlay && !devtoolsWarning && (
+                      <button onClick={startGame}
+                        className="w-full bg-white/10 hover:bg-white/20 text-white font-bold py-2 rounded tracking-wider uppercase text-sm transition mb-2">
+                        Play Again
+                      </button>
+                    )
                   )}
+                  <button onClick={() => { setGameState("menu"); setPlayMode(null); }}
+                    className="w-full bg-white/5 hover:bg-white/10 text-white/40 font-bold py-1.5 rounded tracking-wider uppercase text-xs transition">
+                    Back to Menu
+                  </button>
                 </div>
               </div>
             )}
