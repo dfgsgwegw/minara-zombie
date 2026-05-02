@@ -13,7 +13,7 @@ function formatLocal(date: Date): string {
 export default function AdminPage({ onBack }: Props) {
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
-  const [tab, setTab] = useState<"users" | "tournament">("users");
+  const [tab, setTab] = useState<"users" | "tournament" | "settings">("users");
 
   const [newUsername, setNewUsername] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -29,6 +29,12 @@ export default function AdminPage({ onBack }: Props) {
   );
   const [tourneyMsg, setTourneyMsg] = useState("");
   const [tourneyErr, setTourneyErr] = useState("");
+
+  const [currentPw, setCurrentPw] = useState("");
+  const [newPw, setNewPw] = useState("");
+  const [confirmPw, setConfirmPw] = useState("");
+  const [pwMsg, setPwMsg] = useState("");
+  const [pwErr, setPwErr] = useState("");
 
   async function loadData() {
     try {
@@ -84,6 +90,25 @@ export default function AdminPage({ onBack }: Props) {
     }
   }
 
+  async function changePassword(e: React.FormEvent) {
+    e.preventDefault();
+    setPwMsg("");
+    setPwErr("");
+    if (newPw !== confirmPw) {
+      setPwErr("New passwords do not match");
+      return;
+    }
+    try {
+      await api.admin.changePassword(currentPw, newPw);
+      setPwMsg("Password changed successfully!");
+      setCurrentPw("");
+      setNewPw("");
+      setConfirmPw("");
+    } catch (err: unknown) {
+      setPwErr(err instanceof Error ? err.message : "Failed to change password");
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gray-950 text-white p-4">
       <div className="max-w-2xl mx-auto">
@@ -98,7 +123,7 @@ export default function AdminPage({ onBack }: Props) {
         </div>
 
         <div className="flex mb-6 border-b border-white/10">
-          {(["users", "tournament"] as const).map((t) => (
+          {(["users", "tournament", "settings"] as const).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
@@ -293,6 +318,67 @@ export default function AdminPage({ onBack }: Props) {
                 </div>
               )}
             </div>
+          </div>
+        )}
+
+        {tab === "settings" && (
+          <div className="space-y-6">
+            <form
+              onSubmit={changePassword}
+              className="bg-white/5 border border-white/10 rounded-lg p-6 space-y-4"
+            >
+              <h2 className="font-bold text-white/80 tracking-wider">Change Password</h2>
+              <div>
+                <label className="block text-green-400 text-xs font-bold mb-1 tracking-widest uppercase">
+                  Current Password
+                </label>
+                <input
+                  type="password"
+                  value={currentPw}
+                  onChange={(e) => setCurrentPw(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                  autoComplete="current-password"
+                  className="w-full bg-black/40 border border-white/10 text-white placeholder-white/20 rounded px-3 py-2 focus:outline-none focus:border-green-400"
+                />
+              </div>
+              <div>
+                <label className="block text-green-400 text-xs font-bold mb-1 tracking-widest uppercase">
+                  New Password
+                </label>
+                <input
+                  type="password"
+                  value={newPw}
+                  onChange={(e) => setNewPw(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                  autoComplete="new-password"
+                  className="w-full bg-black/40 border border-white/10 text-white placeholder-white/20 rounded px-3 py-2 focus:outline-none focus:border-green-400"
+                />
+              </div>
+              <div>
+                <label className="block text-green-400 text-xs font-bold mb-1 tracking-widest uppercase">
+                  Confirm New Password
+                </label>
+                <input
+                  type="password"
+                  value={confirmPw}
+                  onChange={(e) => setConfirmPw(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                  autoComplete="new-password"
+                  className="w-full bg-black/40 border border-white/10 text-white placeholder-white/20 rounded px-3 py-2 focus:outline-none focus:border-green-400"
+                />
+              </div>
+              {pwMsg && <p className="text-green-400 text-sm">{pwMsg}</p>}
+              {pwErr && <p className="text-red-400 text-sm">{pwErr}</p>}
+              <button
+                type="submit"
+                className="w-full bg-green-500 hover:bg-green-400 text-black font-black py-2 rounded tracking-widest uppercase transition"
+              >
+                Update Password
+              </button>
+            </form>
           </div>
         )}
       </div>
