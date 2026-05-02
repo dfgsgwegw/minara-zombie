@@ -11,16 +11,27 @@ async function req<T>(
   body?: unknown,
   auth = false,
 ): Promise<T> {
-  const res = await fetch(`${BASE}${path}`, {
-    method,
-    headers: {
-      "Content-Type": "application/json",
-      ...(auth ? authHeaders() : {}),
-    },
-    body: body !== undefined ? JSON.stringify(body) : undefined,
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error ?? "Request failed");
+  let res: Response;
+  try {
+    res = await fetch(`${BASE}${path}`, {
+      method,
+      headers: {
+        "Content-Type": "application/json",
+        ...(auth ? authHeaders() : {}),
+      },
+      body: body !== undefined ? JSON.stringify(body) : undefined,
+    });
+  } catch {
+    throw new Error("Could not reach the server. Check your connection.");
+  }
+  const text = await res.text();
+  let data: Record<string, unknown> = {};
+  try {
+    data = text ? JSON.parse(text) : {};
+  } catch {
+    throw new Error(`Server returned an unexpected response (${res.status}).`);
+  }
+  if (!res.ok) throw new Error((data.error as string) ?? `Request failed (${res.status})`);
   return data as T;
 }
 
