@@ -225,6 +225,7 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
     diffMult: 1,
     screenShake: 0,
     lastDir: 1 as 1 | -1,
+    lastFrameTime: 0,
   });
 
   const shooterImg = useRef(new Image());
@@ -282,7 +283,7 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
     s.shooter = { x: CW / 2 - 48, y: CH - 110, w: 96, h: 96, speed: 25 };
     s.bullets = []; s.zombies = []; s.particles = [];
     s.keys = { a: false, d: false, left: false, right: false };
-    s.pts = 0; s.hp = 100; s.dead = false; s.frame = 0; s.diffMult = 1; s.screenShake = 0; s.lastShot = 0;
+    s.pts = 0; s.hp = 100; s.dead = false; s.frame = 0; s.diffMult = 1; s.screenShake = 0; s.lastShot = 0; s.lastFrameTime = 0;
     setScore(0); setHealth(100);
     setSubmitted(false); setSubmitError(""); setDevtoolsWarning(false);
     setPlayMode("tournament");
@@ -296,7 +297,7 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
     s.shooter = { x: CW / 2 - 48, y: CH - 110, w: 96, h: 96, speed: 25 };
     s.bullets = []; s.zombies = []; s.particles = [];
     s.keys = { a: false, d: false, left: false, right: false };
-    s.pts = 0; s.hp = 100; s.dead = false; s.frame = 0; s.diffMult = 1; s.screenShake = 0; s.lastShot = 0;
+    s.pts = 0; s.hp = 100; s.dead = false; s.frame = 0; s.diffMult = 1; s.screenShake = 0; s.lastShot = 0; s.lastFrameTime = 0;
     setScore(0); setHealth(100);
     setSubmitted(false); setSubmitError(""); setDevtoolsWarning(false);
     setPlayMode("demo");
@@ -375,15 +376,19 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
     ctx.fillText(`${hp}%`, CW - 178 + barW / 2 - 14, 47);
   }
 
-  function loop() {
+  function loop(now: number) {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d")!;
     const s = gs.current;
     if (s.dead) { setGameState("over"); setScore(s.pts); return; }
 
+    // Delta time: scale all movement by elapsed time so speed is frame-rate independent
+    const dt = s.lastFrameTime === 0 ? 1 : Math.min((now - s.lastFrameTime) / 16.667, 3);
+    s.lastFrameTime = now;
+
     s.frame++;
-    // Increase difficulty every 30s worth of frames (~1800 frames @ 60fps)
+    // Increase difficulty every 30s (based on real time via frame count at 60fps)
     s.diffMult = 1 + Math.floor(s.frame / 1800) * 0.25;
 
     // Screen shake
@@ -391,7 +396,7 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
     if (s.screenShake > 0) {
       shakeX = (Math.random() - 0.5) * s.screenShake * 6;
       shakeY = (Math.random() - 0.5) * s.screenShake * 6;
-      s.screenShake -= 0.8;
+      s.screenShake -= 0.8 * dt;
       if (s.screenShake < 0) s.screenShake = 0;
     }
     ctx.save();
@@ -406,7 +411,7 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
 
     // Bubbles
     for (const b of s.bubbles) {
-      b.y -= b.vy;
+      b.y -= b.vy * dt;
       if (b.y < -10) b.y = CH + 10;
       ctx.strokeStyle = `rgba(100,220,255,${b.alpha})`;
       ctx.lineWidth = 1;
@@ -418,8 +423,8 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
     // Shooter movement (arrow keys OR A/D)
     const movingLeft = s.keys.a || s.keys.left;
     const movingRight = s.keys.d || s.keys.right;
-    if (movingLeft && s.shooter.x > 0) { s.shooter.x -= s.shooter.speed; s.lastDir = -1; }
-    if (movingRight && s.shooter.x < CW - s.shooter.w) { s.shooter.x += s.shooter.speed; s.lastDir = 1; }
+    if (movingLeft && s.shooter.x > 0) { s.shooter.x -= s.shooter.speed * dt; s.lastDir = -1; }
+    if (movingRight && s.shooter.x < CW - s.shooter.w) { s.shooter.x += s.shooter.speed * dt; s.lastDir = 1; }
 
     // Zombies
     const spawnChance = 0.095 + s.diffMult * 0.030;
@@ -431,7 +436,7 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
     }
 
     for (let i = s.zombies.length - 1; i >= 0; i--) {
-      s.zombies[i].y += s.zombies[i].speed;
+      s.zombies[i].y += s.zombies[i].speed * dt;
       if (s.zombies[i].flash > 0) {
         ctx.globalAlpha = 0.5;
         ctx.drawImage(zombieImg.current, s.zombies[i].x, s.zombies[i].y, s.zombies[i].w, s.zombies[i].h);
@@ -445,7 +450,7 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
 
     // Bullets
     for (let i = s.bullets.length - 1; i >= 0; i--) {
-      s.bullets[i].y += s.bullets[i].vy;
+      s.bullets[i].y += s.bullets[i].vy * dt;
       drawBullet(ctx, s.bullets[i]);
       if (s.bullets[i].y < -20) s.bullets.splice(i, 1);
     }
@@ -486,9 +491,9 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
     // Particles
     for (let i = s.particles.length - 1; i >= 0; i--) {
       const p = s.particles[i];
-      p.x += p.vx; p.y += p.vy;
-      p.vy += 0.12;
-      p.life -= 0.05;
+      p.x += p.vx * dt; p.y += p.vy * dt;
+      p.vy += 0.12 * dt;
+      p.life -= 0.05 * dt;
       if (p.life <= 0) { s.particles.splice(i, 1); continue; }
       ctx.globalAlpha = p.life;
       ctx.fillStyle = p.color;
