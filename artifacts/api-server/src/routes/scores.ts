@@ -6,9 +6,6 @@ import { randomUUID } from "crypto";
 
 const router = Router();
 
-const MAX_GAME_DURATION_MS = 4 * 60 * 60 * 1000; // 4 hours
-const MAX_SCORE_PER_SECOND = 20;
-
 router.post("/scores/start", requireAuth, async (req, res) => {
   const user = req.user!;
   const now = new Date();
@@ -69,20 +66,6 @@ router.post("/scores", requireAuth, async (req, res) => {
 
   if (session.submitted) {
     res.status(409).json({ error: "Score already submitted for this session" });
-    return;
-  }
-
-  const now = Date.now();
-  const elapsed = now - session.startedAt.getTime();
-
-  if (elapsed > MAX_GAME_DURATION_MS) {
-    res.status(400).json({ error: "Session expired" });
-    return;
-  }
-
-  const maxPossible = Math.ceil((elapsed / 1000) * MAX_SCORE_PER_SECOND);
-  if (score > maxPossible) {
-    res.status(400).json({ error: "Score exceeds what is achievable" });
     return;
   }
 
