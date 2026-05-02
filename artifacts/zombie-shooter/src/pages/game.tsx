@@ -92,6 +92,45 @@ function playZombieHit() {
   } catch {}
 }
 
+function playZombieDeath() {
+  try {
+    const ctx = getAudioCtx();
+    const t = ctx.currentTime;
+    // Short strangled shriek — pitch shoots up then cuts dead
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    const dist = ctx.createWaveShaper();
+    const curve = new Float32Array(256);
+    for (let i = 0; i < 256; i++) { const x = (i * 2) / 256 - 1; curve[i] = (Math.PI + 80) * x / (Math.PI + 80 * Math.abs(x)); }
+    dist.curve = curve;
+    osc.type = "sawtooth";
+    const base = 180 + Math.random() * 80;
+    osc.frequency.setValueAtTime(base, t);
+    osc.frequency.exponentialRampToValueAtTime(base * 2.4, t + 0.08);  // quick shriek up
+    osc.frequency.exponentialRampToValueAtTime(base * 0.6, t + 0.22);  // drop off dead
+    gain.gain.setValueAtTime(0.0, t);
+    gain.gain.linearRampToValueAtTime(0.32, t + 0.03);
+    gain.gain.setValueAtTime(0.32, t + 0.08);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
+    osc.connect(dist); dist.connect(gain); gain.connect(ctx.destination);
+    osc.start(t); osc.stop(t + 0.3);
+    // splat noise burst underneath
+    const bufSize = ctx.sampleRate * 0.1;
+    const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < bufSize; i++) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufSize, 1.5);
+    const noise = ctx.createBufferSource();
+    noise.buffer = buf;
+    const nf = ctx.createBiquadFilter();
+    nf.type = "bandpass"; nf.frequency.value = 800; nf.Q.value = 0.8;
+    const ng = ctx.createGain();
+    ng.gain.setValueAtTime(0.4, t);
+    ng.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
+    noise.connect(nf); nf.connect(ng); ng.connect(ctx.destination);
+    noise.start(t);
+  } catch {}
+}
+
 function playZombieMoan() {
   try {
     const ctx = getAudioCtx();
@@ -663,6 +702,7 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
         if (b && z && b.x > z.x - 8 && b.x < z.x + z.w + 8 && b.y > z.y && b.y < z.y + z.h) {
           spawnParticles(b.x, b.y);
           playZombieHit();
+          playZombieDeath();
           s.zombies.splice(zi, 1);
           s.bullets.splice(bi, 1);
           s.pts += 10;
