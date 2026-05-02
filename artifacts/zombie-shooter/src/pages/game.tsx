@@ -8,7 +8,7 @@ interface Props { onLogout: () => void; loggedIn?: boolean; onLogin?: () => void
 type GameState = "menu" | "playing" | "over";
 type PlayMode = "tournament" | "demo" | null;
 
-interface Bullet { x: number; y: number; vy: number }
+interface Bullet { x: number; y: number; vy: number; charId: string }
 interface Zombie { x: number; y: number; w: number; h: number; speed: number; hp: number; flash: number }
 interface Particle { x: number; y: number; vx: number; vy: number; life: number; maxLife: number; r: number; color: string }
 interface Bubble { x: number; y: number; r: number; vy: number; alpha: number }
@@ -343,18 +343,112 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
   }
 
   function drawBullet(ctx: CanvasRenderingContext2D, b: Bullet) {
-    const grad = ctx.createRadialGradient(b.x + 3, b.y + 6, 0, b.x + 3, b.y + 6, 10);
-    grad.addColorStop(0, "rgba(255,180,255,1)");
-    grad.addColorStop(0.4, "rgba(200,80,255,0.8)");
-    grad.addColorStop(1, "rgba(100,0,200,0)");
-    ctx.fillStyle = grad;
-    ctx.beginPath();
-    ctx.ellipse(b.x + 3, b.y + 6, 10, 14, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = "#fff";
-    ctx.beginPath();
-    ctx.ellipse(b.x + 3, b.y + 4, 3, 5, 0, 0, Math.PI * 2);
-    ctx.fill();
+    const cx = b.x + 3, cy = b.y + 6;
+
+    if (b.charId === "fire") {
+      // Fireball — orange/red flame orb with trailing flicker
+      const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 13);
+      grad.addColorStop(0, "rgba(255,255,180,1)");
+      grad.addColorStop(0.3, "rgba(255,140,0,0.95)");
+      grad.addColorStop(0.7, "rgba(220,40,0,0.7)");
+      grad.addColorStop(1, "rgba(100,0,0,0)");
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, 11, 15, 0, 0, Math.PI * 2);
+      ctx.fill();
+      // flame tip
+      ctx.fillStyle = "rgba(255,220,80,0.9)";
+      ctx.beginPath();
+      ctx.ellipse(cx, cy - 8, 4, 7, 0, 0, Math.PI * 2);
+      ctx.fill();
+      // glow
+      ctx.shadowColor = "#ff6600";
+      ctx.shadowBlur = 18;
+      ctx.fillStyle = "rgba(255,100,0,0.3)";
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, 14, 18, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+    } else if (b.charId === "stone") {
+      // Rock — grey jagged boulder
+      ctx.save();
+      ctx.translate(cx, cy);
+      const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, 10);
+      grad.addColorStop(0, "#d0d0d0");
+      grad.addColorStop(0.5, "#888");
+      grad.addColorStop(1, "#444");
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      // jagged polygon for rock shape
+      ctx.moveTo(0, -12);
+      ctx.lineTo(7, -7);
+      ctx.lineTo(10, 0);
+      ctx.lineTo(6, 8);
+      ctx.lineTo(0, 10);
+      ctx.lineTo(-6, 7);
+      ctx.lineTo(-9, -1);
+      ctx.lineTo(-5, -9);
+      ctx.closePath();
+      ctx.fill();
+      // crack detail
+      ctx.strokeStyle = "rgba(60,60,60,0.6)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(-2, -6); ctx.lineTo(3, 2); ctx.lineTo(-1, 6);
+      ctx.stroke();
+      // highlight
+      ctx.fillStyle = "rgba(255,255,255,0.25)";
+      ctx.beginPath();
+      ctx.ellipse(-3, -4, 3, 4, -0.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+    } else if (b.charId === "squad") {
+      // Rainbow blast — cycling colour rings
+      const t = performance.now() / 120;
+      const colors = ["#ff4444","#ff9900","#ffee00","#44ff44","#00aaff","#cc44ff"];
+      for (let i = 0; i < colors.length; i++) {
+        const angle = (t + i * (Math.PI * 2 / colors.length));
+        const ox = Math.cos(angle) * 4;
+        const oy = Math.sin(angle) * 2;
+        const grad = ctx.createRadialGradient(cx + ox, cy + oy, 0, cx + ox, cy + oy, 7);
+        grad.addColorStop(0, colors[i] + "ff");
+        grad.addColorStop(1, colors[i] + "00");
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.ellipse(cx + ox, cy + oy, 7, 7, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      // bright white core
+      ctx.fillStyle = "#ffffff";
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, 3, 5, 0, 0, Math.PI * 2);
+      ctx.fill();
+      // sparkle ring glow
+      ctx.shadowColor = "#ffffff";
+      ctx.shadowBlur = 12;
+      ctx.fillStyle = "rgba(255,255,255,0.5)";
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, 5, 7, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+    } else {
+      // OG Pod — original purple magic blast
+      const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 10);
+      grad.addColorStop(0, "rgba(255,180,255,1)");
+      grad.addColorStop(0.4, "rgba(200,80,255,0.8)");
+      grad.addColorStop(1, "rgba(100,0,200,0)");
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, 10, 14, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "#fff";
+      ctx.beginPath();
+      ctx.ellipse(cx, cy - 2, 3, 5, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
   }
 
   function drawHud(ctx: CanvasRenderingContext2D, pts: number, hp: number) {
@@ -417,7 +511,7 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
       const now2 = performance.now();
       if (now2 - s.lastShot >= 400) {
         s.lastShot = now2;
-        s.bullets.push({ x: s.shooter.x + s.shooter.w / 2 - 3, y: s.shooter.y + 10, vy: -14 });
+        s.bullets.push({ x: s.shooter.x + s.shooter.w / 2 - 3, y: s.shooter.y + 10, vy: -14, charId: CHARACTERS[selectedCharRef.current].id });
         playMagicShot();
       }
     }
@@ -620,7 +714,7 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
     const now = performance.now();
     if (now - s.lastShot < 120) return; // 120ms fire cooldown for smooth UX
     s.lastShot = now;
-    s.bullets.push({ x: s.shooter.x + s.shooter.w / 2 - 3, y: s.shooter.y + 10, vy: -14 });
+    s.bullets.push({ x: s.shooter.x + s.shooter.w / 2 - 3, y: s.shooter.y + 10, vy: -14, charId: CHARACTERS[selectedCharRef.current].id });
     playMagicShot();
   }
 
