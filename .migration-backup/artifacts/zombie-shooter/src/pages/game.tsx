@@ -261,6 +261,13 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
   useEffect(() => { gameStateRef.current = gameState; }, [gameState]);
   useEffect(() => { playModeRef.current = playMode; }, [playMode]);
 
+  // Auto-submit score when the game ends normally (player dies in tournament mode)
+  useEffect(() => {
+    if (gameState === "over" && playModeRef.current === "tournament" && !devtoolsWarning) {
+      autoSubmitScore();
+    }
+  }, [gameState]);
+
   useEffect(() => {
     if (!tournament) return;
     const startMs = new Date(tournament.startTime).getTime();
@@ -1148,7 +1155,34 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
                         Score invalidated — DevTools detected.
                       </p>
                     )}
-                      {playMode === "demo" ? (
+
+                    {/* Score submission status — tournament mode only */}
+                    {playMode === "tournament" && !devtoolsWarning && (
+                      <div className="mb-4">
+                        {submitting && (
+                          <p className="text-cyan-400 text-xs bg-cyan-900/20 border border-cyan-500/20 rounded px-3 py-2 animate-pulse">
+                            ⏳ Saving your score...
+                          </p>
+                        )}
+                        {submitted && !submitting && (
+                          <p className="text-green-400 text-xs bg-green-900/20 border border-green-500/20 rounded px-3 py-2">
+                            ✅ Score saved to leaderboard!
+                          </p>
+                        )}
+                        {submitError && !submitting && !submitted && (
+                          <div className="text-red-400 text-xs bg-red-900/20 border border-red-500/20 rounded px-3 py-2">
+                            <p className="mb-2">❌ {submitError}</p>
+                            <button
+                              onClick={autoSubmitScore}
+                              className="w-full bg-red-500/20 hover:bg-red-500/30 text-red-300 font-bold py-1.5 rounded tracking-wider uppercase text-xs transition">
+                              Retry Submit
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {playMode === "demo" ? (
                       <div className="mb-4">
                         <p className="text-white/40 text-xs mb-3 border border-white/10 rounded px-3 py-2">
                           🎮 Demo mode — score not saved
