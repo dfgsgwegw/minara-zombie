@@ -804,6 +804,7 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
   const canPlay = tournamentStatus === "active";
   const canStartTournament = loggedIn && canPlay;
   const tournamentWaiting = loggedIn && tournamentStatus === "upcoming";
+  const tournamentStartingSoon = loggedIn && tournamentStatus === "upcoming";
 
   const overlayBg: React.CSSProperties = {
     backgroundImage: "url('/assets/background.png')",
@@ -1084,23 +1085,27 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
                         </button>
                       )}
                       {loggedIn && !canPlay && (
-                        <div className={`text-sm border px-6 py-3 rounded-xl text-center ${
-                          tournamentStatus === "ended"
+                        <div className={`text-sm border-2 px-6 py-3 rounded-xl text-center font-black tracking-widest uppercase ${
+                          tournamentStatus === "upcoming"
+                            ? "text-yellow-300 border-yellow-400/60 bg-yellow-500/15 shadow-[0_0_18px_rgba(250,204,21,0.25)] animate-pulse"
+                            : tournamentStatus === "ended"
                             ? "text-red-300 border-red-500/30 bg-red-900/10"
                             : "text-white/30 border-white/10"
                         }`}>
                           {tournamentStatus === "upcoming"
-                            ? "Tournament hasn't started yet"
+                            ? `⏳ ${timeLeft} until start`
                             : tournamentStatus === "ended"
                             ? "🏆 Tournament ended · Check the final leaderboard →"
                             : "No active tournament"}
                         </div>
                       )}
-                      <button onClick={startDemoGame}
-                        className="font-black py-2.5 rounded-xl text-sm tracking-widest uppercase border transition w-full"
-                        style={{ background: "rgba(255,255,255,0.04)", borderColor: "rgba(0,200,255,0.25)", color: "rgba(0,212,255,0.75)" }}>
-                        🎮 Play Demo
-                      </button>
+                      {!loggedIn && (
+                        <button onClick={startDemoGame}
+                          className="font-black py-2.5 rounded-xl text-sm tracking-widest uppercase border transition w-full"
+                          style={{ background: "rgba(255,255,255,0.04)", borderColor: "rgba(0,200,255,0.25)", color: "rgba(0,212,255,0.75)" }}>
+                          🎮 Play Demo
+                        </button>
+                      )}
                       {!loggedIn && (
                         <p className="text-white/20 text-[10px] text-center">
                           Scores not saved ·{" "}
