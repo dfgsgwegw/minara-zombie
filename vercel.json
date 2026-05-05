@@ -1,0 +1,15 @@
+{
+  "buildCommand": "pnpm --filter @workspace/api-server run build:vercel && pnpm --filter @workspace/zombie-shooter run build:vercel",
+  "outputDirectory": "artifacts/zombie-shooter/dist/public",
+  "installCommand": "pnpm install --no-frozen-lockfile",
+  "framework": null,
+  "functions": {
+    "api/index.mjs": {
+      "maxDuration": 30
+    }
+  },
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "/api/index" },
+    { "source": "/((?!assets/).*)", "destination": "/index.html" }
+  ]
+}
