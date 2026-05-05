@@ -214,11 +214,13 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
     lastPulse: 0,
     signals: [] as Array<{ x: number; y: number; vy: number; text: string; color: string; alpha: number }>,
     lastSignal: 0,
+    tickerX: 0,
   });
 
   const shooterImg = useRef(new Image());
   const zombieImg = useRef(new Image());
   const bgImg = useRef(new Image());
+  const mascotImg = useRef(new Image());
 
   const fetchTournament = useCallback(async () => {
     try { const d = await api.currentTournament(); setTournamentStatus(d.status); setTournament(d.tournament); } catch {}
@@ -234,6 +236,7 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
     shooterImg.current = charImgs.current[0];
     zombieImg.current.src = "/assets/zombie.png";
     bgImg.current.src = "/assets/background.png";
+    mascotImg.current.src = "/assets/characters/player-glasses-girl.png";
 
     // Detect mobile/touch device
     const mq = window.matchMedia("(max-width: 639px)");
@@ -760,8 +763,8 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
 
     // ── Floating signals ──────────────────────────────────────────
     {
-      const signalTexts = ["BUY", "SELL", "RSI 72", "MACD ↑", "BULL", "BEAR", "+2.4%", "-1.8%", "ATH!", "DIP?", "HODL", "ENTRY"];
-      const signalColors = ["#22c55e","#ef4444","#fbbf24","#60a5fa","#22c55e","#ef4444","#22c55e","#ef4444","#22c55e","#ef4444","#a78bfa","#E8729A"];
+      const signalTexts = ["BUY", "SELL", "RSI 72", "MACD ↑", "BULL RUN", "BEAR TRAP", "+2.4%", "-1.8%", "ATH!", "DIP?", "HODL", "ENTRY", "MINARA ✓", "AI SIGNAL", "WALL ST.", "PORTFOLIO ▲", "AGENT ON", "DEFEND!"];
+      const signalColors = ["#22c55e","#ef4444","#fbbf24","#60a5fa","#22c55e","#ef4444","#22c55e","#ef4444","#22c55e","#ef4444","#a78bfa","#E8729A","#E8729A","#E8729A","#EDE8DC","#22c55e","#E8729A","#fbbf24"];
       const now3 = performance.now();
       if (now3 - s.lastSignal > 1600) {
         s.lastSignal = now3;
@@ -808,6 +811,103 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
         ? `rgba(34,197,94,${b.alpha * 0.85})`
         : `rgba(239,68,68,${b.alpha * 0.85})`;
       ctx.fillText(isGreen ? `+${(b.r * 0.8).toFixed(2)}%` : `-${(b.r * 0.5).toFixed(2)}%`, b.x, b.y);
+    }
+
+    // ── Minara ghost mascot watermark ────────────────────────────
+    if (mascotImg.current.complete && mascotImg.current.naturalWidth > 0) {
+      ctx.save();
+      ctx.globalAlpha = 0.06;
+      const mw = 260, mh = 320;
+      ctx.drawImage(mascotImg.current, CW - mw - 4, CH - mh - 2, mw, mh);
+      ctx.restore();
+    }
+
+    // ── Minara corner logo stamp ──────────────────────────────────
+    {
+      ctx.save();
+      ctx.globalAlpha = 0.55;
+      // pill background
+      ctx.fillStyle = "rgba(28,26,24,0.72)";
+      ctx.beginPath();
+      ctx.roundRect(10, CH - 36, 136, 28, 5);
+      ctx.fill();
+      ctx.strokeStyle = "rgba(232,114,154,0.5)";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      // ● dot
+      ctx.globalAlpha = 0.85;
+      ctx.fillStyle = "#E8729A";
+      ctx.beginPath();
+      ctx.arc(24, CH - 22, 5, 0, Math.PI * 2);
+      ctx.fill();
+      // MINARA text
+      ctx.font = "bold 13px 'Georgia', serif";
+      ctx.fillStyle = "#EDE8DC";
+      ctx.fillText("MINARA", 34, CH - 17);
+      // AI DEFENDER sub
+      ctx.font = "bold 8px monospace";
+      ctx.fillStyle = "#E8729A";
+      ctx.fillText("AI DEFENDER", 34, CH - 8);
+      ctx.restore();
+    }
+
+    // ── Scrolling ticker tape ─────────────────────────────────────
+    {
+      const tickerItems = [
+        "MINARA ▲4.2%", "RUN YOUR OWN WALL STREET", "BTC $94,200 ▲1.1%",
+        "SOL $182 ▲2.4%", "ETH $3,400", "PORTFOLIO DEFENSE MODE",
+        "AI SIGNAL ACTIVE", "MINARA AGENT ONLINE", "BUY THE DIP",
+        "WALL STREET UNLOCKED", "PROFIT SECURED ✓", "MINARA.AI",
+      ];
+      const tickerStr = tickerItems.map(t => `  ◆ ${t}  `).join("");
+      ctx.font = "bold 10px monospace";
+      const fullW = ctx.measureText(tickerStr).width;
+      s.tickerX -= 0.9 * dt;
+      if (s.tickerX < -fullW) s.tickerX = 0;
+
+      // tape background
+      ctx.save();
+      ctx.globalAlpha = 0.82;
+      ctx.fillStyle = "rgba(28,26,24,0.88)";
+      ctx.fillRect(0, CH - 18, CW, 18);
+      ctx.strokeStyle = "rgba(232,114,154,0.4)";
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(0, CH - 18); ctx.lineTo(CW, CH - 18); ctx.stroke();
+
+      // scrolling text — draw twice to loop seamlessly
+      ctx.globalAlpha = 0.95;
+      ctx.fillStyle = "#EDE8DC";
+      ctx.shadowColor = "#E8729A";
+      ctx.shadowBlur = 3;
+      ctx.fillText(tickerStr, s.tickerX, CH - 5);
+      ctx.fillText(tickerStr, s.tickerX + fullW, CH - 5);
+      // highlight ◆ separators in pink
+      ctx.restore();
+    }
+
+    // ── AI AGENT ACTIVE pulse badge ───────────────────────────────
+    {
+      const pulse = Math.sin(performance.now() / 400) * 0.3 + 0.7;
+      ctx.save();
+      ctx.globalAlpha = pulse * 0.9;
+      ctx.fillStyle = "rgba(28,26,24,0.78)";
+      ctx.beginPath();
+      ctx.roundRect(CW / 2 - 72, 8, 144, 24, 5);
+      ctx.fill();
+      ctx.strokeStyle = "rgba(232,114,154,0.6)";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      // blinking dot
+      ctx.fillStyle = pulse > 0.75 ? "#E8729A" : "#fbbf24";
+      ctx.beginPath();
+      ctx.arc(CW / 2 - 56, 20, 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.font = "bold 10px monospace";
+      ctx.fillStyle = "#EDE8DC";
+      ctx.textAlign = "center";
+      ctx.fillText("MINARA AI AGENT ACTIVE", CW / 2 + 8, 24);
+      ctx.textAlign = "left";
+      ctx.restore();
     }
 
     // Shooter movement (arrow keys OR A/D)
