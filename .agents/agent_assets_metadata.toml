@@ -48,3 +48,27 @@ id = "g_0fnWLkEugPashawYwQ6"
 uri = "file://artifacts/zombie-shooter/public/assets/characters/minara-commander.png"
 type = "image"
 title = "minara commander halftone"
+
+[[generated]]
+id = "B4Dfo1kkP4ZMvOlsae59o"
+uri = "file://artifacts/zombie-shooter/public/assets/characters/minara-hacker-shooter.png"
+type = "image"
+title = "hacker shooter pose sprite"
+
+[[generated]]
+id = "vPfZqjS1ejeyeGEn-D5DQ"
+uri = "file://artifacts/zombie-shooter/public/assets/characters/minara-arcane-shooter.png"
+type = "image"
+title = "arcane shooter pose sprite"
+
+[[generated]]
+id = "KORTPX1k-Ofm-owMoWPBB"
+uri = "file://artifacts/zombie-shooter/public/assets/characters/minara-cyber-shooter.png"
+type = "image"
+title = "cyber shooter pose sprite"
+
+[[generated]]
+id = "sheJJiJvAtkYlUw0DP3Cw"
+uri = "file://artifacts/zombie-shooter/public/assets/characters/minara-commander-shooter.png"
+type = "image"
+title = "commander shooter pose sprite"
