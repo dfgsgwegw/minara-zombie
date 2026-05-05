@@ -36,6 +36,17 @@ pnpm workspace monorepo using TypeScript. Pacific Pods Zombie Shooter — a tour
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
 - `pnpm --filter @workspace/api-server run dev` — run API server locally
 
+## Admin Setup (First-Time Bootstrap)
+
+On a fresh deployment with no admin user, call this endpoint once to create the initial admin account:
+
+```
+POST /api/auth/bootstrap-admin
+{ "discordUsername": "yourname", "password": "yourpassword" }
+```
+
+This endpoint returns `409 Conflict` once an admin exists, making it safe to leave enabled. After bootstrap, log in at `/admin` with the credentials you set.
+
 ## Environment Variables Required
 
 - `DATABASE_URL` — PostgreSQL connection string (auto-provisioned)

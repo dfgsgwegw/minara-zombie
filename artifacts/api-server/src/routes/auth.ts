@@ -83,4 +83,45 @@ router.post("/auth/login", async (req, res) => {
   });
 });
 
+
+// One-time admin bootstrap: POST /api/auth/bootstrap-admin
+// Creates the initial admin user only if NO admin exists yet.
+// Body: { discordUsername, password }
+// Once an admin exists, this endpoint returns 409 and is effectively disabled.
+router.post("/auth/bootstrap-admin", async (req, res) => {
+  const { discordUsername, password } = req.body as {
+    discordUsername?: string;
+    password?: string;
+  };
+
+  if (!discordUsername || !password) {
+    res.status(400).json({ error: "discordUsername and password are required" });
+    return;
+  }
+
+  if (password.length < 6) {
+    res.status(400).json({ error: "Password must be at least 6 characters" });
+    return;
+  }
+
+  const admins = await db
+    .select()
+    .from(usersTable)
+    .where(eq(usersTable.isAdmin, true));
+
+  if (admins.length > 0) {
+    res.status(409).json({ error: "An admin account already exists" });
+    return;
+  }
+
+  const passwordHash = await bcrypt.hash(password, 12);
+  const [admin] = await db
+    .insert(usersTable)
+    .values({ discordUsername, passwordHash, isAdmin: true })
+    .returning();
+
+  res.json({ ok: true, discordUsername: admin.discordUsername });
+});
+
 export default router;
+
