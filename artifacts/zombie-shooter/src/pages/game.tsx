@@ -208,6 +208,13 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
     screenShake: 0,
     lastDir: 1 as 1 | -1,
     lastFrameTime: 0,
+    chartPoints: [] as number[],
+    chartScroll: 0,
+    scanY: 0,
+    pulses: [] as Array<{ x: number; y: number; r: number; maxR: number; alpha: number }>,
+    lastPulse: 0,
+    signals: [] as Array<{ x: number; y: number; vy: number; text: string; color: string; alpha: number }>,
+    lastSignal: 0,
   });
 
   const shooterImg = useRef(new Image());
@@ -237,13 +244,28 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
 
     // init background bubbles
     const s = gs.current;
-    for (let i = 0; i < 18; i++) {
+    for (let i = 0; i < 22; i++) {
       s.bubbles.push({
         x: Math.random() * CW, y: Math.random() * CH,
-        r: 2 + Math.random() * 5, vy: 0.3 + Math.random() * 0.6,
-        alpha: 0.1 + Math.random() * 0.25,
+        r: 2 + Math.random() * 5, vy: 0.3 + Math.random() * 0.7,
+        alpha: 0.08 + Math.random() * 0.28,
       });
     }
+
+    // init chart with random price walk
+    s.chartPoints = [];
+    s.pulses = [];
+    s.signals = [];
+    let price = 45 + Math.random() * 20;
+    for (let i = 0; i < 220; i++) {
+      price += (Math.random() - 0.47) * 2.8;
+      price = Math.max(8, Math.min(92, price));
+      s.chartPoints.push(price);
+    }
+    s.chartScroll = 0;
+    s.scanY = 0;
+    s.lastPulse = 0;
+    s.lastSignal = 0;
 
     fetchTournament(); fetchLeaderboard();
     const lb = setInterval(fetchLeaderboard, 10_000);
@@ -565,7 +587,6 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
     if (bgImg.current.complete && bgImg.current.naturalWidth > 0) {
       ctx.drawImage(bgImg.current, 0, 0, CW, CH);
     } else {
-      // Fallback: draw a dark trading-floor gradient
       const grad = ctx.createLinearGradient(0, 0, 0, CH);
       grad.addColorStop(0, "#05080F");
       grad.addColorStop(0.5, "#0A0E18");
@@ -574,22 +595,194 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
       ctx.fillRect(0, 0, CW, CH);
     }
 
-    // Dark vignette overlay
-    const vignette = ctx.createRadialGradient(CW/2, CH/2, CH*0.25, CW/2, CH/2, CH*0.85);
+    // ── Grid overlay ─────────────────────────────────────────────
+    ctx.save();
+    ctx.globalAlpha = 0.06;
+    ctx.strokeStyle = "#22c55e";
+    ctx.lineWidth = 1;
+    for (let gx = 0; gx <= CW; gx += 78) {
+      ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, CH); ctx.stroke();
+    }
+    for (let gy = 0; gy <= CH; gy += 65) {
+      ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(CW, gy); ctx.stroke();
+    }
+    ctx.restore();
+
+    // ── Scrolling line chart ─────────────────────────────────────
+    {
+      const cps = s.chartPoints;
+      s.chartScroll += 0.55 * dt;
+
+      // Add a new price point every 7 frames
+      if (s.frame % 7 === 0) {
+        const last = cps[cps.length - 1] ?? 50;
+        const next = last + (Math.random() - 0.47) * 2.8 * s.diffMult;
+        cps.push(Math.max(6, Math.min(94, next)));
+        if (cps.length > 320) cps.shift();
+      }
+
+      const stride = 10;
+      const visibleCount = Math.ceil(CW / stride) + 4;
+      const slice = cps.slice(Math.max(0, cps.length - visibleCount));
+      const chartTop = CH * 0.52;
+      const chartH = CH * 0.42;
+      const scrollOff = s.chartScroll % stride;
+
+      if (slice.length > 1) {
+        const minP = Math.min(...slice) - 4;
+        const maxP = Math.max(...slice) + 4;
+        const scaleP = (p: number) => chartTop + chartH - ((p - minP) / (maxP - minP)) * chartH;
+
+        // Area fill
+        ctx.save();
+        ctx.beginPath();
+        slice.forEach((p, i) => {
+          const x = i * stride - scrollOff;
+          const y = scaleP(p);
+          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        });
+        const lastX = (slice.length - 1) * stride - scrollOff;
+        ctx.lineTo(lastX, chartTop + chartH);
+        ctx.lineTo(-scrollOff, chartTop + chartH);
+        ctx.closePath();
+        const areaGrad = ctx.createLinearGradient(0, chartTop, 0, chartTop + chartH);
+        areaGrad.addColorStop(0, "rgba(34,197,94,0.28)");
+        areaGrad.addColorStop(1, "rgba(34,197,94,0.0)");
+        ctx.fillStyle = areaGrad;
+        ctx.globalAlpha = 0.9;
+        ctx.fill();
+
+        // Line
+        ctx.beginPath();
+        slice.forEach((p, i) => {
+          const x = i * stride - scrollOff;
+          const y = scaleP(p);
+          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        });
+        ctx.strokeStyle = "#22c55e";
+        ctx.lineWidth = 2;
+        ctx.globalAlpha = 0.7;
+        ctx.shadowColor = "#22c55e";
+        ctx.shadowBlur = 8;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        // Candle-style bar markers every 5 points
+        ctx.globalAlpha = 0.55;
+        for (let i = 4; i < slice.length; i += 5) {
+          const x = i * stride - scrollOff + stride / 2;
+          const open = scaleP(slice[i - 4]);
+          const close = scaleP(slice[i]);
+          const high = scaleP(Math.max(...slice.slice(i - 4, i + 1)));
+          const low = scaleP(Math.min(...slice.slice(i - 4, i + 1)));
+          const isUp = slice[i] >= slice[i - 4];
+          const candleColor = isUp ? "#22c55e" : "#ef4444";
+          ctx.strokeStyle = candleColor;
+          ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.moveTo(x, high); ctx.lineTo(x, low); ctx.stroke();
+          ctx.fillStyle = candleColor;
+          const bodyTop = Math.min(open, close);
+          const bodyH = Math.max(2, Math.abs(close - open));
+          ctx.fillRect(x - 3, bodyTop, 6, bodyH);
+        }
+        ctx.restore();
+      }
+    }
+
+    // ── Expanding pulse rings ─────────────────────────────────────
+    {
+      const now2 = performance.now();
+      if (now2 - s.lastPulse > 900) {
+        s.lastPulse = now2;
+        s.pulses.push({
+          x: 80 + Math.random() * (CW - 160),
+          y: CH * 0.25 + Math.random() * CH * 0.5,
+          r: 0, maxR: 55 + Math.random() * 90, alpha: 0.55,
+        });
+      }
+      for (let i = s.pulses.length - 1; i >= 0; i--) {
+        const p = s.pulses[i];
+        p.r += 1.6 * dt;
+        p.alpha -= 0.007 * dt;
+        if (p.alpha <= 0 || p.r >= p.maxR) { s.pulses.splice(i, 1); continue; }
+        ctx.save();
+        ctx.globalAlpha = p.alpha * 0.35;
+        ctx.strokeStyle = "#E8729A";
+        ctx.lineWidth = 1.5;
+        ctx.shadowColor = "#E8729A";
+        ctx.shadowBlur = 6;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.globalAlpha = p.alpha * 0.12;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r * 0.55, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+
+    // ── CRT scan line ─────────────────────────────────────────────
+    {
+      s.scanY += 1.4 * dt;
+      if (s.scanY > CH + 30) s.scanY = -30;
+      const sg = ctx.createLinearGradient(0, s.scanY - 18, 0, s.scanY + 18);
+      sg.addColorStop(0, "rgba(34,197,94,0)");
+      sg.addColorStop(0.5, "rgba(34,197,94,0.10)");
+      sg.addColorStop(1, "rgba(34,197,94,0)");
+      ctx.fillStyle = sg;
+      ctx.fillRect(0, s.scanY - 18, CW, 36);
+    }
+
+    // ── Floating signals ──────────────────────────────────────────
+    {
+      const signalTexts = ["BUY", "SELL", "RSI 72", "MACD ↑", "BULL", "BEAR", "+2.4%", "-1.8%", "ATH!", "DIP?", "HODL", "ENTRY"];
+      const signalColors = ["#22c55e","#ef4444","#fbbf24","#60a5fa","#22c55e","#ef4444","#22c55e","#ef4444","#22c55e","#ef4444","#a78bfa","#E8729A"];
+      const now3 = performance.now();
+      if (now3 - s.lastSignal > 1600) {
+        s.lastSignal = now3;
+        const idx = Math.floor(Math.random() * signalTexts.length);
+        s.signals.push({
+          x: 30 + Math.random() * (CW - 100),
+          y: CH * 0.85,
+          vy: 0.5 + Math.random() * 0.7,
+          text: signalTexts[idx],
+          color: signalColors[idx],
+          alpha: 0.55 + Math.random() * 0.25,
+        });
+      }
+      for (let i = s.signals.length - 1; i >= 0; i--) {
+        const sig = s.signals[i];
+        sig.y -= sig.vy * dt;
+        sig.alpha -= 0.003 * dt;
+        if (sig.alpha <= 0 || sig.y < -20) { s.signals.splice(i, 1); continue; }
+        ctx.save();
+        ctx.globalAlpha = sig.alpha;
+        ctx.font = "bold 11px monospace";
+        ctx.fillStyle = sig.color;
+        ctx.shadowColor = sig.color;
+        ctx.shadowBlur = 8;
+        ctx.fillText(sig.text, sig.x, sig.y);
+        ctx.restore();
+      }
+    }
+
+    // ── Dark vignette overlay ─────────────────────────────────────
+    const vignette = ctx.createRadialGradient(CW/2, CH/2, CH*0.22, CW/2, CH/2, CH*0.88);
     vignette.addColorStop(0, "rgba(0,0,0,0)");
-    vignette.addColorStop(1, "rgba(0,0,0,0.55)");
+    vignette.addColorStop(1, "rgba(0,0,0,0.62)");
     ctx.fillStyle = vignette;
     ctx.fillRect(0, 0, CW, CH);
 
-    // Floating ticker numbers (replaced bubbles)
+    // ── Floating ticker numbers ───────────────────────────────────
     for (const b of s.bubbles) {
       b.y -= b.vy * dt;
-      if (b.y < -20) b.y = CH + 20;
-      const isGreen = b.alpha > 0.1;
-      ctx.font = `${Math.round(b.r * 1.2)}px monospace`;
+      if (b.y < -20) { b.y = CH + 20; b.x = Math.random() * CW; b.alpha = 0.08 + Math.random() * 0.28; }
+      const isGreen = b.alpha > 0.15;
+      ctx.font = `bold ${Math.round(b.r * 1.3)}px monospace`;
       ctx.fillStyle = isGreen
-        ? `rgba(34,197,94,${b.alpha * 0.7})`
-        : `rgba(239,68,68,${b.alpha * 0.7})`;
+        ? `rgba(34,197,94,${b.alpha * 0.85})`
+        : `rgba(239,68,68,${b.alpha * 0.85})`;
       ctx.fillText(isGreen ? `+${(b.r * 0.8).toFixed(2)}%` : `-${(b.r * 0.5).toFixed(2)}%`, b.x, b.y);
     }
 
