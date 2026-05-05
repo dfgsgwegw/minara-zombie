@@ -156,20 +156,7 @@ overrides:
 importers:
 
   .:
-    dependencies:
-      cors:
-        specifier: ^2
-        version: 2.8.6
-      express:
-        specifier: ^5
-        version: 5.2.1
     devDependencies:
-      '@types/cors':
-        specifier: ^2.8.19
-        version: 2.8.19
-      '@types/express':
-        specifier: ^5.0.6
-        version: 5.0.6
       prettier:
         specifier: ^3.8.1
         version: 3.8.1
@@ -210,6 +197,9 @@ importers:
         specifier: ^10
         version: 10.5.0
     devDependencies:
+      '@types/bcryptjs':
+        specifier: ^2.4.6
+        version: 2.4.6
       '@types/cookie-parser':
         specifier: ^1.4.10
         version: 1.4.10(@types/express@5.0.6)
@@ -657,23 +647,10 @@ importers:
         version: 0.31.9
 
   scripts:
-    dependencies:
-      bcryptjs:
-        specifier: ^3.0.3
-        version: 3.0.3
-      pg:
-        specifier: ^8.13.3
-        version: 8.20.0
     devDependencies:
-      '@types/bcryptjs':
-        specifier: ^2.4.6
-        version: 2.4.6
       '@types/node':
         specifier: 'catalog:'
         version: 25.3.5
-      '@types/pg':
-        specifier: ^8.11.11
-        version: 8.18.0
       tsx:
         specifier: 'catalog:'
         version: 4.21.0

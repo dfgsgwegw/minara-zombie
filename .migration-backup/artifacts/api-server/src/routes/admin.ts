@@ -1,6 +1,6 @@
 import { Router } from "express";
 import bcrypt from "bcryptjs";
-import { db, usersTable, tournamentsTable, scoresTable } from "@workspace/db";
+import { db, usersTable, tournamentsTable, scoresTable, gameSessionsTable } from "@workspace/db";
 import { eq, sql } from "drizzle-orm";
 import { requireAdmin } from "../middlewares/auth.js";
 
@@ -79,6 +79,9 @@ router.delete("/admin/tournaments/:id", requireAdmin, async (req, res) => {
     res.status(400).json({ error: "Invalid tournament id" });
     return;
   }
+  // Delete child records first (no CASCADE on FK constraints)
+  await db.delete(scoresTable).where(eq(scoresTable.tournamentId, id));
+  await db.delete(gameSessionsTable).where(eq(gameSessionsTable.tournamentId, id));
   await db.delete(tournamentsTable).where(eq(tournamentsTable.id, id));
   res.json({ ok: true });
 });

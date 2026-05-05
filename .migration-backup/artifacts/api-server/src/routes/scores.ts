@@ -49,30 +49,41 @@ router.post("/scores", requireAuth, async (req, res) => {
     return;
   }
 
-  const [session] = await db
-    .select()
-    .from(gameSessionsTable)
-    .where(eq(gameSessionsTable.sessionToken, sessionToken));
-
-  if (!session) {
-    res.status(403).json({ error: "Invalid session" });
-    return;
-  }
-
-  if (session.userId !== user.userId) {
-    res.status(403).json({ error: "Session does not belong to you" });
-    return;
-  }
-
-  if (session.submitted) {
-    res.status(409).json({ error: "Score already submitted for this session" });
-    return;
-  }
-
-  await db
+  // Atomic check-and-mark: UPDATE only if session belongs to this user AND not yet submitted.
+  // This single statement is safe under any number of concurrent requests — the DB serializes
+  // the UPDATE internally, so only one request can ever flip submitted from false → true.
+  const updated = await db
     .update(gameSessionsTable)
     .set({ submitted: true })
-    .where(eq(gameSessionsTable.id, session.id));
+    .where(
+      and(
+        eq(gameSessionsTable.sessionToken, sessionToken),
+        eq(gameSessionsTable.userId, user.userId),
+        eq(gameSessionsTable.submitted, false),
+      ),
+    )
+    .returning();
+
+  if (updated.length === 0) {
+    // Distinguish between "invalid session", "wrong user", and "already submitted"
+    const [existing] = await db
+      .select()
+      .from(gameSessionsTable)
+      .where(eq(gameSessionsTable.sessionToken, sessionToken));
+    if (!existing) {
+      res.status(403).json({ error: "Invalid session" });
+      return;
+    }
+    if (existing.userId !== user.userId) {
+      res.status(403).json({ error: "Session does not belong to you" });
+      return;
+    }
+    // submitted was already true — idempotent success so the client doesn't retry forever
+    res.json({ ok: true, score, alreadySubmitted: true });
+    return;
+  }
+
+  const session = updated[0];
 
   await db.insert(scoresTable).values({
     userId: user.userId,
