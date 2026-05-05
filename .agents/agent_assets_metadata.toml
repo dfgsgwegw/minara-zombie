@@ -72,3 +72,15 @@ id = "sheJJiJvAtkYlUw0DP3Cw"
 uri = "file://artifacts/zombie-shooter/public/assets/characters/minara-commander-shooter.png"
 type = "image"
 title = "commander shooter pose sprite"
+
+[[generated]]
+id = "MvlxtSLiUnAMByt-ow2M4"
+uri = "file://artifacts/zombie-shooter/public/assets/characters/player-glasses-girl-shooter.png"
+type = "image"
+title = "glasses girl shooter sprite top down"
+
+[[generated]]
+id = "gB1ZBJzUV5Nf_krS6BVUb"
+uri = "file://artifacts/zombie-shooter/public/assets/characters/player-blue-boy-shooter.png"
+type = "image"
+title = "blue shirt boy shooter sprite top down"

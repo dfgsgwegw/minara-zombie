@@ -17,11 +17,13 @@ const CW = 780;
 const CH = 560;
 
 const CHARACTERS = [
-  { id: "core",      name: "Minara Core",  src: "/assets/characters/minara-core.png",      shooterSrc: "/assets/shooter.png",                                    color: "#c084fc", bg: "rgba(192,132,252,0.25)" },
-  { id: "hacker",    name: "Hacker",       src: "/assets/characters/minara-hacker.png",    shooterSrc: "/assets/characters/minara-hacker-shooter.png",    color: "#60a5fa", bg: "rgba(96,165,250,0.25)" },
-  { id: "arcane",    name: "Arcane",       src: "/assets/characters/minara-arcane.png",    shooterSrc: "/assets/characters/minara-arcane-shooter.png",    color: "#a78bfa", bg: "rgba(167,139,250,0.25)" },
-  { id: "cyber",     name: "Cyber",        src: "/assets/characters/minara-cyber.png",     shooterSrc: "/assets/characters/minara-cyber-shooter.png",     color: "#f472b6", bg: "rgba(244,114,182,0.25)" },
-  { id: "commander", name: "Commander",    src: "/assets/characters/minara-commander.png", shooterSrc: "/assets/characters/minara-commander-shooter.png", color: "#fbbf24", bg: "rgba(251,191,36,0.25)" },
+  { id: "core",      name: "Minara Core",  src: "/assets/characters/minara-core.png",           shooterSrc: "/assets/shooter.png",                                         color: "#c084fc", bg: "rgba(192,132,252,0.25)" },
+  { id: "hacker",    name: "Hacker",       src: "/assets/characters/minara-hacker.png",         shooterSrc: "/assets/characters/minara-hacker-shooter.png",         color: "#60a5fa", bg: "rgba(96,165,250,0.25)" },
+  { id: "arcane",    name: "Arcane",       src: "/assets/characters/minara-arcane.png",         shooterSrc: "/assets/characters/minara-arcane-shooter.png",         color: "#a78bfa", bg: "rgba(167,139,250,0.25)" },
+  { id: "cyber",     name: "Cyber",        src: "/assets/characters/minara-cyber.png",          shooterSrc: "/assets/characters/minara-cyber-shooter.png",          color: "#f472b6", bg: "rgba(244,114,182,0.25)" },
+  { id: "commander", name: "Commander",    src: "/assets/characters/minara-commander.png",      shooterSrc: "/assets/characters/minara-commander-shooter.png",      color: "#fbbf24", bg: "rgba(251,191,36,0.25)" },
+  { id: "glassygirl", name: "Glassy",      src: "/assets/characters/player-glasses-girl.png",  shooterSrc: "/assets/characters/player-glasses-girl-shooter.png",  color: "#e879f9", bg: "rgba(232,121,249,0.25)" },
+  { id: "bluekid",   name: "Blue",         src: "/assets/characters/player-blue-boy.png",      shooterSrc: "/assets/characters/player-blue-boy-shooter.png",      color: "#38bdf8", bg: "rgba(56,189,248,0.25)" },
 ];
 
 /* ── Audio ─────────────────────────────────────────────────────── */
