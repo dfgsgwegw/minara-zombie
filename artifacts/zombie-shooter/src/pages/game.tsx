@@ -351,15 +351,16 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
 
   function spawnParticles(x: number, y: number) {
     const s = gs.current;
-    const colors = ["#4ade80", "#22c55e", "#86efac", "#bbf7d0", "#a3e635"];
-    for (let i = 0; i < 12; i++) {
-      const angle = (Math.PI * 2 * i) / 12 + Math.random() * 0.5;
-      const speed = 2 + Math.random() * 4;
+    // Gold and green — profits booked!
+    const colors = ["#E8729A", "#fbbf24", "#f59e0b", "#fcd34d", "#22c55e", "#EDE8DC"];
+    for (let i = 0; i < 14; i++) {
+      const angle = (Math.PI * 2 * i) / 14 + Math.random() * 0.5;
+      const speed = 2.5 + Math.random() * 5;
       s.particles.push({
         x, y,
         vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
         life: 1, maxLife: 1,
-        r: 3 + Math.random() * 4,
+        r: 3 + Math.random() * 5,
         color: colors[Math.floor(Math.random() * colors.length)],
       });
     }
@@ -458,60 +459,70 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
       ctx.shadowBlur = 0;
 
     } else {
-      // OG Pod — original purple magic blast
-      const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 10);
-      grad.addColorStop(0, "rgba(255,180,255,1)");
-      grad.addColorStop(0.4, "rgba(200,80,255,0.8)");
-      grad.addColorStop(1, "rgba(100,0,200,0)");
+      // Minara signal shot — pink/gold trading signal orb
+      const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 11);
+      grad.addColorStop(0, "rgba(255,240,200,1)");
+      grad.addColorStop(0.35, "rgba(232,114,154,0.95)");
+      grad.addColorStop(0.75, "rgba(180,60,100,0.6)");
+      grad.addColorStop(1, "rgba(80,0,40,0)");
       ctx.fillStyle = grad;
       ctx.beginPath();
-      ctx.ellipse(cx, cy, 10, 14, 0, 0, Math.PI * 2);
+      ctx.ellipse(cx, cy, 10, 15, 0, 0, Math.PI * 2);
       ctx.fill();
-      ctx.fillStyle = "#fff";
+      // bright core
+      ctx.fillStyle = "rgba(255,255,220,0.95)";
       ctx.beginPath();
-      ctx.ellipse(cx, cy - 2, 3, 5, 0, 0, Math.PI * 2);
+      ctx.ellipse(cx, cy - 2, 3, 4, 0, 0, Math.PI * 2);
       ctx.fill();
+      // glow
+      ctx.shadowColor = "#E8729A";
+      ctx.shadowBlur = 12;
+      ctx.fillStyle = "rgba(232,114,154,0.25)";
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, 13, 17, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
     }
   }
 
   function drawHud(ctx: CanvasRenderingContext2D, pts: number, hp: number) {
-    // Score box
-    ctx.fillStyle = "rgba(0,10,20,0.7)";
+    // Score box — dark card, gold text
+    ctx.fillStyle = "rgba(10,8,6,0.82)";
     ctx.beginPath();
-    ctx.roundRect(8, 8, 180, 62, 8);
+    ctx.roundRect(8, 8, 190, 66, 6);
     ctx.fill();
-    ctx.strokeStyle = "rgba(0,200,255,0.3)";
-    ctx.lineWidth = 1;
+    ctx.strokeStyle = "rgba(232,114,154,0.5)";
+    ctx.lineWidth = 1.5;
     ctx.stroke();
 
-    ctx.font = "bold 14px 'monospace'";
-    ctx.fillStyle = "rgba(0,200,255,0.9)";
-    ctx.fillText("SCORE", 18, 28);
-    ctx.font = "bold 22px 'monospace'";
-    ctx.fillStyle = "#fbbf24";
-    ctx.fillText(String(pts), 18, 52);
+    ctx.font = "bold 11px 'Inter', sans-serif";
+    ctx.fillStyle = "rgba(200,195,186,0.9)";
+    ctx.fillText("PROFIT SCORE", 18, 26);
+    ctx.font = "bold 28px 'Georgia', serif";
+    ctx.fillStyle = "#E8729A";
+    ctx.fillText("$" + String(pts), 18, 56);
 
-    // Health bar
-    ctx.fillStyle = "rgba(0,10,20,0.7)";
+    // Health bar — dark card, colored bar
+    ctx.fillStyle = "rgba(10,8,6,0.82)";
     ctx.beginPath();
-    ctx.roundRect(CW - 188, 8, 180, 62, 8);
+    ctx.roundRect(CW - 194, 8, 186, 66, 6);
     ctx.fill();
-    ctx.strokeStyle = "rgba(0,200,255,0.3)";
-    ctx.lineWidth = 1;
+    ctx.strokeStyle = "rgba(232,114,154,0.5)";
+    ctx.lineWidth = 1.5;
     ctx.stroke();
-    ctx.font = "bold 12px monospace";
-    ctx.fillStyle = "rgba(0,200,255,0.9)";
-    ctx.fillText("HEALTH", CW - 178, 26);
-    const barW = 154;
+    ctx.font = "bold 11px 'Inter', sans-serif";
+    ctx.fillStyle = "rgba(200,195,186,0.9)";
+    ctx.fillText("PORTFOLIO HEALTH", CW - 184, 26);
+    const barW = 162;
     const barFill = (hp / 100) * barW;
-    ctx.fillStyle = "rgba(255,255,255,0.08)";
-    ctx.beginPath(); ctx.roundRect(CW - 178, 34, barW, 16, 4); ctx.fill();
-    const hc = hp > 60 ? "#4ade80" : hp > 30 ? "#facc15" : "#ef4444";
+    ctx.fillStyle = "rgba(255,255,255,0.06)";
+    ctx.beginPath(); ctx.roundRect(CW - 184, 36, barW, 16, 4); ctx.fill();
+    const hc = hp > 60 ? "#22c55e" : hp > 30 ? "#facc15" : "#ef4444";
     ctx.fillStyle = hc;
-    if (barFill > 0) { ctx.beginPath(); ctx.roundRect(CW - 178, 34, barFill, 16, 4); ctx.fill(); }
+    if (barFill > 0) { ctx.beginPath(); ctx.roundRect(CW - 184, 36, barFill, 16, 4); ctx.fill(); }
     ctx.font = "bold 11px monospace";
     ctx.fillStyle = "white";
-    ctx.fillText(`${hp}%`, CW - 178 + barW / 2 - 14, 47);
+    ctx.fillText(`${hp}%`, CW - 184 + barW / 2 - 14, 49);
   }
 
   function loop(now: number) {
@@ -551,21 +562,35 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
     ctx.translate(shakeX, shakeY);
 
     // Background
-    ctx.drawImage(bgImg.current, 0, 0, CW, CH);
+    if (bgImg.current.complete && bgImg.current.naturalWidth > 0) {
+      ctx.drawImage(bgImg.current, 0, 0, CW, CH);
+    } else {
+      // Fallback: draw a dark trading-floor gradient
+      const grad = ctx.createLinearGradient(0, 0, 0, CH);
+      grad.addColorStop(0, "#05080F");
+      grad.addColorStop(0.5, "#0A0E18");
+      grad.addColorStop(1, "#060A12");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, CW, CH);
+    }
 
-    // Underwater overlay tint
-    ctx.fillStyle = "rgba(0,30,60,0.18)";
+    // Dark vignette overlay
+    const vignette = ctx.createRadialGradient(CW/2, CH/2, CH*0.25, CW/2, CH/2, CH*0.85);
+    vignette.addColorStop(0, "rgba(0,0,0,0)");
+    vignette.addColorStop(1, "rgba(0,0,0,0.55)");
+    ctx.fillStyle = vignette;
     ctx.fillRect(0, 0, CW, CH);
 
-    // Bubbles
+    // Floating ticker numbers (replaced bubbles)
     for (const b of s.bubbles) {
       b.y -= b.vy * dt;
-      if (b.y < -10) b.y = CH + 10;
-      ctx.strokeStyle = `rgba(100,220,255,${b.alpha})`;
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
-      ctx.stroke();
+      if (b.y < -20) b.y = CH + 20;
+      const isGreen = b.alpha > 0.1;
+      ctx.font = `${Math.round(b.r * 1.2)}px monospace`;
+      ctx.fillStyle = isGreen
+        ? `rgba(34,197,94,${b.alpha * 0.7})`
+        : `rgba(239,68,68,${b.alpha * 0.7})`;
+      ctx.fillText(isGreen ? `+${(b.r * 0.8).toFixed(2)}%` : `-${(b.r * 0.5).toFixed(2)}%`, b.x, b.y);
     }
 
     // Shooter movement (arrow keys OR A/D)
@@ -603,10 +628,10 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
       ctx.translate(cx, cy);
       ctx.rotate(tilt);
 
-      // green glow aura
+      // red market-crash aura
       const aura = ctx.createRadialGradient(0, 0, sw * 0.2, 0, 0, sw * 0.72);
-      aura.addColorStop(0, "rgba(60,255,80,0.18)");
-      aura.addColorStop(1, "rgba(0,180,0,0)");
+      aura.addColorStop(0, "rgba(255,40,40,0.22)");
+      aura.addColorStop(1, "rgba(180,0,0,0)");
       ctx.fillStyle = aura;
       ctx.beginPath();
       ctx.ellipse(0, 0, sw * 0.72, sh * 0.72, 0, 0, Math.PI * 2);
@@ -723,23 +748,36 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
     // HUD
     drawHud(ctx, s.pts, s.hp);
 
-    // Difficulty indicator
+    // Difficulty indicator — centered top
     if (s.diffMult > 1) {
-      ctx.font = "bold 11px monospace";
-      ctx.fillStyle = `rgba(255,${Math.max(0,220-s.diffMult*40)},50,0.8)`;
-      ctx.fillText(`⚡ LEVEL ${Math.floor(s.diffMult / 0.25) - 2}`, CW / 2 - 28, 22);
+      const lvl = Math.floor(s.diffMult / 0.25) - 2;
+      ctx.fillStyle = "rgba(10,8,6,0.75)";
+      ctx.beginPath();
+      ctx.roundRect(CW / 2 - 60, 8, 120, 28, 6);
+      ctx.fill();
+      ctx.strokeStyle = "rgba(239,68,68,0.6)";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.font = "bold 12px monospace";
+      ctx.fillStyle = "#ef4444";
+      ctx.textAlign = "center";
+      ctx.fillText(`🔴 BEAR MARKET LVL ${lvl}`, CW / 2, 27);
+      ctx.textAlign = "left";
     }
 
     // Demo mode badge
     if (playMode === "demo") {
-      ctx.fillStyle = "rgba(0,10,20,0.65)";
+      ctx.fillStyle = "rgba(10,8,6,0.7)";
       ctx.beginPath();
-      ctx.roundRect(CW / 2 - 44, CH - 28, 88, 20, 5);
+      ctx.roundRect(CW / 2 - 52, CH - 30, 104, 22, 5);
       ctx.fill();
+      ctx.strokeStyle = "rgba(232,114,154,0.4)";
+      ctx.lineWidth = 1;
+      ctx.stroke();
       ctx.font = "bold 11px monospace";
-      ctx.fillStyle = "rgba(0,200,255,0.55)";
+      ctx.fillStyle = "rgba(232,114,154,0.8)";
       ctx.textAlign = "center";
-      ctx.fillText("🎮 DEMO MODE", CW / 2, CH - 14);
+      ctx.fillText("📊 DEMO TRADING", CW / 2, CH - 15);
       ctx.textAlign = "left";
     }
 

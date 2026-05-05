@@ -5,19 +5,19 @@ outputs = []
 id = "s-3iDTukXi1pwO9rGa3RU"
 uri = "file://artifacts/zombie-shooter/public/assets/background.png"
 type = "image"
-title = "minara cream background"
+title = "minara trading floor background"
 
 [[generated]]
 id = "I2_4avLB4EtI-d-dLhrnC"
 uri = "file://artifacts/zombie-shooter/public/assets/shooter.png"
 type = "image"
-title = "minara mascot sprite"
+title = "shooter back view upward"
 
 [[generated]]
 id = "34pWkY9om-Ef2yz7QGVKk"
 uri = "file://artifacts/zombie-shooter/public/assets/zombie.png"
 type = "image"
-title = "minara enemy halftone"
+title = "trading bear zombie enemy"
 
 [[generated]]
 id = "_iaZ-LhSnKT14jy8jYqL7"
