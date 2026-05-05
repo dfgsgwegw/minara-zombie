@@ -17,11 +17,11 @@ const CW = 780;
 const CH = 560;
 
 const CHARACTERS = [
-  { id: "og",    name: "OG Pod",    src: "/assets/shooter.png",                       shooterSrc: "/assets/shooter.png",                                  color: "#b060ff", bg: "rgba(140,60,255,0.25)" },
-  { id: "mvp",   name: "POD MVP",   src: "/assets/characters/pod-mvp.jpg",            shooterSrc: "/assets/characters/pod-mvp-shooter.png",               color: "#4499ff", bg: "rgba(40,120,255,0.25)" },
-  { id: "stone", name: "Stone Pod", src: "/assets/characters/stone-pod.jpg",          shooterSrc: "/assets/characters/stone-pod-shooter.png",             color: "#aaaaaa", bg: "rgba(150,150,150,0.25)" },
-  { id: "fire",  name: "Fire Pod",  src: "/assets/characters/fire-pod.jpg",           shooterSrc: "/assets/characters/fire-pod-shooter.png",              color: "#ff6600", bg: "rgba(255,80,0,0.25)" },
-  { id: "squad", name: "The Squad", src: "/assets/characters/squad-pod.jpg",          shooterSrc: "/assets/characters/squad-pod-shooter.png",             color: "#ff88cc", bg: "rgba(255,80,180,0.25)" },
+  { id: "core",      name: "Minara Core",  src: "/assets/characters/minara-core.png",      shooterSrc: "/assets/shooter.png",                                    color: "#c084fc", bg: "rgba(192,132,252,0.25)" },
+  { id: "hacker",    name: "Hacker",       src: "/assets/characters/minara-hacker.png",    shooterSrc: "/assets/characters/minara-hacker.png",                   color: "#60a5fa", bg: "rgba(96,165,250,0.25)" },
+  { id: "arcane",    name: "Arcane",       src: "/assets/characters/minara-arcane.png",    shooterSrc: "/assets/characters/minara-arcane.png",                   color: "#a78bfa", bg: "rgba(167,139,250,0.25)" },
+  { id: "cyber",     name: "Cyber",        src: "/assets/characters/minara-cyber.png",     shooterSrc: "/assets/characters/minara-cyber.png",                    color: "#f472b6", bg: "rgba(244,114,182,0.25)" },
+  { id: "commander", name: "Commander",    src: "/assets/characters/minara-commander.png", shooterSrc: "/assets/characters/minara-commander.png",                color: "#fbbf24", bg: "rgba(251,191,36,0.25)" },
 ];
 
 /* ── Audio ─────────────────────────────────────────────────────── */
@@ -116,9 +116,9 @@ function LiveLeaderboard({ entries, myUsername, tournament, tournamentStatus }: 
   const isEnded = tournamentStatus === "ended" || (tournament ? new Date(tournament.endTime) <= new Date() : false);
 
   return (
-    <div className="flex flex-col h-full overflow-hidden rounded-lg border border-cyan-500/20" style={{ background: "rgba(0,20,30,0.88)" }}>
-      <div className="px-3 py-2 border-b border-cyan-500/20 flex-shrink-0" style={{ background: "rgba(0,60,80,0.5)" }}>
-        <p className="text-cyan-400 font-black tracking-widest text-xs uppercase">🌊 Leaderboard</p>
+    <div className="flex flex-col h-full overflow-hidden rounded-lg" style={{ background: "rgba(10,0,30,0.88)", border: "1px solid rgba(192,132,252,0.2)" }}>
+      <div className="px-3 py-2 border-b flex-shrink-0" style={{ background: "rgba(40,0,80,0.5)", borderColor: "rgba(192,132,252,0.2)" }}>
+        <p className="font-black tracking-widest text-xs uppercase" style={{ color: "#c084fc" }}>🤖 Leaderboard</p>
         {tournament && (
           isEnded
             ? <p className="text-red-400 text-xs font-bold mt-0.5">🔴 ENDED · Final Scores</p>
@@ -128,19 +128,19 @@ function LiveLeaderboard({ entries, myUsername, tournament, tournamentStatus }: 
       <div className="flex-1 overflow-y-auto">
         {entries.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-white/20 text-xs text-center px-3 py-8">
-            <span className="text-2xl mb-2">🧟</span>No scores yet
+            <span className="text-2xl mb-2">🤖</span>No scores yet
           </div>
         ) : entries.map((e) => {
           const isMe = e.discordUsername === myUsername;
           return (
             <div key={e.discordUsername}
-              className={`flex items-center gap-2 px-3 py-2 border-b border-white/5 ${isMe ? "bg-cyan-900/25" : ""}`}>
+              className={`flex items-center gap-2 px-3 py-2 border-b border-white/5 ${isMe ? "bg-purple-900/25" : ""}`}>
               <span className={`text-sm w-6 text-center flex-shrink-0 font-black ${RANK_COLOR[e.rank] ?? "text-white/40"}`}>
                 {RANK_MEDAL[e.rank] ?? `#${e.rank}`}
               </span>
               <div className="flex-1 min-w-0">
-                <p className={`text-xs font-bold truncate ${isMe ? "text-cyan-400" : "text-white/80"}`}>
-                  {e.discordUsername}{isMe && <span className="text-cyan-600 ml-1">←</span>}
+                <p className={`text-xs font-bold truncate ${isMe ? "text-purple-400" : "text-white/80"}`}>
+                  {e.discordUsername}{isMe && <span className="text-purple-600 ml-1">←</span>}
                 </p>
                 <p className="text-white/30 text-[10px]">{e.gamesPlayed}× played</p>
               </div>
@@ -834,37 +834,39 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
   const renderSidebar = () => (
     <>
       {!loggedIn ? (
-        <div className="flex flex-col h-full overflow-hidden rounded-lg border border-cyan-500/30" style={{ background: "rgba(0,20,30,0.92)" }}>
-          <div className="px-3 py-2 border-b border-cyan-500/20 flex-shrink-0 flex items-center justify-between" style={{ background: "rgba(0,60,80,0.5)" }}>
-            <p className="text-cyan-400 font-black tracking-widest text-xs uppercase">🔐 Login to Play</p>
+        <div className="flex flex-col h-full overflow-hidden rounded-lg" style={{ background: "rgba(10,0,30,0.92)", border: "1px solid rgba(192,132,252,0.3)" }}>
+          <div className="px-3 py-2 border-b flex-shrink-0 flex items-center justify-between" style={{ background: "rgba(40,0,80,0.5)", borderColor: "rgba(192,132,252,0.2)" }}>
+            <p className="font-black tracking-widest text-xs uppercase" style={{ color: "#c084fc" }}>🔐 Login to Play</p>
             {isMobile && <button onClick={() => setShowSidebar(false)} className="text-white/40 text-lg leading-none">×</button>}
           </div>
           <form onSubmit={handleSidebarLogin} className="p-3 space-y-2.5 flex-shrink-0">
             <div>
-              <label className="block text-cyan-400/70 text-[10px] font-bold mb-1 tracking-widest uppercase">Discord Username</label>
+              <label className="block text-[10px] font-bold mb-1 tracking-widest uppercase" style={{ color: "rgba(192,132,252,0.7)" }}>Discord Username</label>
               <input type="text" value={loginUsername} onChange={e => setLoginUsername(e.target.value)}
                 placeholder="Username" required autoComplete="username"
-                className="w-full bg-black/60 border border-cyan-500/30 text-white placeholder-white/20 rounded px-2 py-1.5 text-xs focus:outline-none focus:border-cyan-400 transition" />
+                className="w-full bg-black/60 text-white placeholder-white/20 rounded px-2 py-1.5 text-xs focus:outline-none transition"
+                style={{ border: "1px solid rgba(192,132,252,0.3)" }} />
             </div>
             <div>
-              <label className="block text-cyan-400/70 text-[10px] font-bold mb-1 tracking-widest uppercase">Password</label>
+              <label className="block text-[10px] font-bold mb-1 tracking-widest uppercase" style={{ color: "rgba(192,132,252,0.7)" }}>Password</label>
               <input type="password" value={loginPassword} onChange={e => setLoginPassword(e.target.value)}
                 placeholder="••••••••" required autoComplete="current-password"
-                className="w-full bg-black/60 border border-cyan-500/30 text-white placeholder-white/20 rounded px-2 py-1.5 text-xs focus:outline-none focus:border-cyan-400 transition" />
+                className="w-full bg-black/60 text-white placeholder-white/20 rounded px-2 py-1.5 text-xs focus:outline-none transition"
+                style={{ border: "1px solid rgba(192,132,252,0.3)" }} />
             </div>
             {loginError && <p className="text-red-400 text-[10px] bg-red-900/20 border border-red-500/20 rounded p-1.5">{loginError}</p>}
             <button type="submit" disabled={loginLoading}
               className="w-full text-black font-black py-2 rounded text-xs tracking-widest uppercase transition disabled:opacity-50"
-              style={{ background: "linear-gradient(135deg, #00d4ff, #0080ff)" }}>
+              style={{ background: "linear-gradient(135deg, #c084fc, #a855f7)" }}>
               {loginLoading ? "Logging in..." : "Login"}
             </button>
           </form>
-          <div className="flex-1 overflow-y-auto border-t border-cyan-500/15">
-            <div className="px-3 py-1.5 border-b border-cyan-500/15" style={{ background: "rgba(0,40,60,0.4)" }}>
-              <p className="text-cyan-400/60 text-[10px] font-black tracking-widest uppercase">🌊 Leaderboard</p>
+          <div className="flex-1 overflow-y-auto border-t" style={{ borderColor: "rgba(192,132,252,0.15)" }}>
+            <div className="px-3 py-1.5 border-b" style={{ background: "rgba(40,0,80,0.4)", borderColor: "rgba(192,132,252,0.15)" }}>
+              <p className="text-[10px] font-black tracking-widest uppercase" style={{ color: "rgba(192,132,252,0.6)" }}>🤖 Leaderboard</p>
             </div>
             {leaderboard.length === 0 ? (
-              <div className="text-white/20 text-[10px] text-center py-4">🧟 No scores yet</div>
+              <div className="text-white/20 text-[10px] text-center py-4">🤖 No scores yet</div>
             ) : leaderboard.map(e => (
               <div key={e.discordUsername} className="flex items-center gap-1.5 px-3 py-1.5 border-b border-white/5">
                 <span className={`text-[10px] w-5 text-center flex-shrink-0 font-black ${RANK_COLOR[e.rank] ?? "text-white/40"}`}>
@@ -894,19 +896,19 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
 
       {/* Header */}
       <div className="flex items-center justify-between px-3 py-2 border-b flex-shrink-0 gap-2"
-        style={{ borderColor: "rgba(0,200,255,0.12)", background: "rgba(0,10,20,0.95)" }}>
-        <span className="text-cyan-400 font-bold text-xs truncate min-w-0">
+        style={{ borderColor: "rgba(192,132,252,0.15)", background: "rgba(5,0,20,0.95)" }}>
+        <span className="font-bold text-xs truncate min-w-0" style={{ color: "#c084fc" }}>
           {loggedIn ? user?.discordUsername : <span className="text-white/30 italic">Not logged in</span>}
         </span>
         <h1 className="font-black tracking-widest text-xs sm:text-sm flex-shrink-0"
-          style={{ color: "#00d4ff", textShadow: "0 0 12px rgba(0,212,255,0.6)" }}>
-          🌊 PACIFIC ZOMBIE FIGHTER
+          style={{ color: "#c084fc", textShadow: "0 0 12px rgba(192,132,252,0.6)" }}>
+          🤖 MINARA AI DEFENDER
         </h1>
         <div className="flex items-center gap-2 flex-shrink-0">
           {/* Mobile sidebar toggle */}
           {isMobile && (
             <button onClick={() => setShowSidebar(v => !v)}
-              className="text-cyan-400/70 text-xs border border-cyan-500/30 px-2 py-0.5 rounded">
+              className="text-xs px-2 py-0.5 rounded" style={{ color: "rgba(192,132,252,0.7)", border: "1px solid rgba(192,132,252,0.3)" }}>
               {loggedIn ? "🏆" : "🔐"}
             </button>
           )}
@@ -926,7 +928,7 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
         <div className="text-center py-1 px-2 flex-shrink-0">
           {tournament ? (
             <span className={`text-xs font-bold px-3 py-0.5 rounded ${
-              canPlay ? "bg-cyan-500/15 text-cyan-400"
+              canPlay ? "bg-purple-500/15 text-purple-400"
               : tournamentStatus === "ended" ? "bg-red-500/15 text-red-400"
               : "bg-yellow-500/15 text-yellow-400"
             }`}>
@@ -971,7 +973,7 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
                   {/* Left button */}
                   <button
                     className="pointer-events-auto rounded-2xl flex items-center justify-center font-black text-3xl select-none"
-                    style={{ width: 110, height: 90, background: "rgba(0,180,255,0.2)", border: "2px solid rgba(0,212,255,0.5)", color: "#00d4ff", WebkitTapHighlightColor: "transparent", touchAction: "none" }}
+                    style={{ width: 110, height: 90, background: "rgba(192,132,252,0.2)", border: "2px solid rgba(192,132,252,0.5)", color: "#c084fc", WebkitTapHighlightColor: "transparent", touchAction: "none" }}
                     onPointerDown={() => mobileLeft(true)}
                     onPointerUp={() => mobileLeft(false)}
                     onPointerLeave={() => mobileLeft(false)}
@@ -982,7 +984,7 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
                   {/* Right button */}
                   <button
                     className="pointer-events-auto rounded-2xl flex items-center justify-center font-black text-3xl select-none"
-                    style={{ width: 110, height: 90, background: "rgba(0,180,255,0.2)", border: "2px solid rgba(0,212,255,0.5)", color: "#00d4ff", WebkitTapHighlightColor: "transparent", touchAction: "none" }}
+                    style={{ width: 110, height: 90, background: "rgba(192,132,252,0.2)", border: "2px solid rgba(192,132,252,0.5)", color: "#c084fc", WebkitTapHighlightColor: "transparent", touchAction: "none" }}
                     onPointerDown={() => mobileRight(true)}
                     onPointerUp={() => mobileRight(false)}
                     onPointerLeave={() => mobileRight(false)}
@@ -994,25 +996,25 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
               {/* Menu */}
               {gameState === "menu" && (
                 <div className="absolute inset-0 rounded-lg flex items-center justify-center overflow-hidden" style={overlayBg}>
-                  {/* Dark ocean overlay */}
-                  <div className="absolute inset-0 rounded-lg" style={{ background: "rgba(0,3,12,0.78)" }} />
+                  {/* Dark overlay */}
+                  <div className="absolute inset-0 rounded-lg" style={{ background: "rgba(3,0,15,0.82)" }} />
                   {/* Poster glow rays */}
-                  <div className="absolute inset-0 rounded-lg" style={{ background: "radial-gradient(ellipse 70% 60% at 50% 30%, rgba(0,180,255,0.10) 0%, transparent 70%)" }} />
+                  <div className="absolute inset-0 rounded-lg" style={{ background: "radial-gradient(ellipse 70% 60% at 50% 30%, rgba(192,132,252,0.12) 0%, transparent 70%)" }} />
 
                   <div className="relative z-10 w-full max-w-lg mx-2 flex flex-col items-center">
 
                     {/* ── POSTER HEADER ── */}
-                    <p className="text-[10px] sm:text-xs font-black tracking-[0.3em] mb-1" style={{ color: "rgba(0,200,255,0.55)" }}>
-                      PACIFIC POD NFT PRESENTS
+                    <p className="text-[10px] sm:text-xs font-black tracking-[0.3em] mb-1" style={{ color: "rgba(192,132,252,0.55)" }}>
+                      MINARA AI PRESENTS
                     </p>
                     <div className="text-center leading-none mb-0.5">
                       <span className="block font-black tracking-[0.25em] text-4xl sm:text-5xl"
-                        style={{ color: "#00d4ff", textShadow: "0 0 40px rgba(0,212,255,0.9), 0 0 80px rgba(0,150,255,0.4)" }}>
-                        PACIFIC PODS
+                        style={{ color: "#c084fc", textShadow: "0 0 40px rgba(192,132,252,0.9), 0 0 80px rgba(168,85,247,0.4)" }}>
+                        MINARA AI
                       </span>
                       <span className="block font-black tracking-[0.15em] text-2xl sm:text-3xl text-white mt-0.5"
                         style={{ textShadow: "0 0 20px rgba(255,255,255,0.3)" }}>
-                        ZOMBIE SHOOTER
+                        ZOMBIE DEFENDER
                       </span>
                     </div>
                     <div className="flex gap-1 mb-3 mt-1">
@@ -1046,10 +1048,10 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
 
                     {/* ── CHARACTER SELECT ── */}
                     <div className="w-full rounded-xl border mb-3 overflow-hidden"
-                      style={{ background: "rgba(0,8,20,0.85)", borderColor: "rgba(0,200,255,0.2)" }}>
+                      style={{ background: "rgba(8,0,20,0.85)", borderColor: "rgba(192,132,252,0.2)" }}>
                       <p className="text-[10px] font-black tracking-widest uppercase text-center py-1.5"
-                        style={{ color: "rgba(0,200,255,0.6)", background: "rgba(0,40,70,0.5)", borderBottom: "1px solid rgba(0,200,255,0.15)" }}>
-                        ⚡ Choose Your Pod
+                        style={{ color: "rgba(192,132,252,0.6)", background: "rgba(40,0,80,0.5)", borderBottom: "1px solid rgba(192,132,252,0.15)" }}>
+                        ⚡ Choose Your AI
                       </p>
                       <div className="flex justify-center gap-2 p-3 flex-wrap">
                         {CHARACTERS.map((c, i) => (
@@ -1099,8 +1101,8 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
                       {loggedIn && canPlay && (
                         <button onClick={startGame}
                           className="font-black py-3 rounded-xl text-base tracking-widest uppercase text-black transition w-full"
-                          style={{ background: `linear-gradient(135deg, ${CHARACTERS[selectedChar].color}, #0080ff)`, boxShadow: `0 0 24px ${CHARACTERS[selectedChar].color}66` }}>
-                          ⚔️ Enter the Deep
+                          style={{ background: `linear-gradient(135deg, ${CHARACTERS[selectedChar].color}, #a855f7)`, boxShadow: `0 0 24px ${CHARACTERS[selectedChar].color}66` }}>
+                          🤖 Launch Defense
                         </button>
                       )}
                       {loggedIn && !canPlay && (
@@ -1121,14 +1123,14 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
                       {!loggedIn && (
                         <button onClick={startDemoGame}
                           className="font-black py-2.5 rounded-xl text-sm tracking-widest uppercase border transition w-full"
-                          style={{ background: "rgba(255,255,255,0.04)", borderColor: "rgba(0,200,255,0.25)", color: "rgba(0,212,255,0.75)" }}>
+                          style={{ background: "rgba(255,255,255,0.04)", borderColor: "rgba(192,132,252,0.25)", color: "rgba(192,132,252,0.75)" }}>
                           🎮 Play Demo
                         </button>
                       )}
                       {!loggedIn && (
                         <p className="text-white/20 text-[10px] text-center">
                           Scores not saved ·{" "}
-                          <span className="text-cyan-500/50 cursor-pointer" onClick={() => setShowSidebar(true)}>Login</span>{" "}
+                          <span className="cursor-pointer" style={{ color: "rgba(192,132,252,0.5)" }} onClick={() => setShowSidebar(true)}>Login</span>{" "}
                           to compete
                         </p>
                       )}
@@ -1160,7 +1162,7 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
                     {playMode === "tournament" && !devtoolsWarning && (
                       <div className="mb-4">
                         {submitting && (
-                          <p className="text-cyan-400 text-xs bg-cyan-900/20 border border-cyan-500/20 rounded px-3 py-2 animate-pulse">
+                          <p className="text-purple-400 text-xs bg-purple-900/20 border border-purple-500/20 rounded px-3 py-2 animate-pulse">
                             ⏳ Saving your score...
                           </p>
                         )}
@@ -1188,7 +1190,7 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
                           🎮 Demo mode — score not saved
                         </p>
                         {!loggedIn && (
-                          <p className="text-cyan-400/60 text-xs mb-3">Login to compete on the leaderboard!</p>
+                          <p className="text-purple-400/60 text-xs mb-3">Login to compete on the leaderboard!</p>
                         )}
                       </div>
                     ) : null}

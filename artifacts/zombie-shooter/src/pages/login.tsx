@@ -43,18 +43,20 @@ export default function LoginPage({ onLogin, adminMode = false }: Props) {
       <div className="absolute inset-0 bg-black/70" />
       <div className="relative z-10 w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-black text-green-400 tracking-widest drop-shadow-[0_0_20px_rgba(74,222,128,0.8)] mb-1">
-            PACIFIC
+          <h1 className="text-4xl font-black tracking-widest drop-shadow-[0_0_20px_rgba(192,132,252,0.8)] mb-1"
+            style={{ color: "#c084fc" }}>
+            MINARA AI
           </h1>
-          <h2 className="text-3xl font-black text-white tracking-widest">ZOMBIE FIGHTER</h2>
-          <p className="text-green-400/70 mt-2 tracking-wider text-sm">
+          <h2 className="text-3xl font-black text-white tracking-widest">ZOMBIE DEFENDER</h2>
+          <p className="mt-2 tracking-wider text-sm" style={{ color: "rgba(192,132,252,0.7)" }}>
             {adminMode ? "ADMIN ACCESS" : "TOURNAMENT"}
           </p>
         </div>
 
         <form
           onSubmit={handleSubmit}
-          className="bg-black/80 border border-green-500/30 rounded-lg p-8 shadow-[0_0_40px_rgba(74,222,128,0.15)]"
+          className="bg-black/80 rounded-lg p-8"
+          style={{ border: "1px solid rgba(192,132,252,0.3)", boxShadow: "0 0 40px rgba(192,132,252,0.15)" }}
         >
           {adminMode && (
             <div className="mb-5 text-center">
@@ -65,15 +67,15 @@ export default function LoginPage({ onLogin, adminMode = false }: Props) {
           )}
 
           {!adminMode && (
-            <div className="mb-5 p-3 bg-green-500/10 border border-green-500/20 rounded text-center">
-              <p className="text-green-400 text-xs tracking-wide">
+            <div className="mb-5 p-3 rounded text-center" style={{ background: "rgba(192,132,252,0.1)", border: "1px solid rgba(192,132,252,0.2)" }}>
+              <p className="text-xs tracking-wide" style={{ color: "rgba(192,132,252,0.9)" }}>
                 Enter your Discord username and the tournament password provided by the organiser
               </p>
             </div>
           )}
 
           <div className="mb-5">
-            <label className="block text-green-400 text-sm font-bold mb-2 tracking-widest uppercase">
+            <label className="block text-sm font-bold mb-2 tracking-widest uppercase" style={{ color: "#c084fc" }}>
               Discord Username
             </label>
             <input
@@ -83,12 +85,13 @@ export default function LoginPage({ onLogin, adminMode = false }: Props) {
               placeholder={adminMode ? "admin" : "YourDiscordName"}
               required
               autoComplete="username"
-              className="w-full bg-black/60 border border-green-500/40 text-white placeholder-green-900 rounded px-4 py-3 focus:outline-none focus:border-green-400 focus:ring-1 focus:ring-green-400/50 transition"
+              className="w-full bg-black/60 text-white rounded px-4 py-3 focus:outline-none transition"
+              style={{ border: "1px solid rgba(192,132,252,0.4)", caretColor: "#c084fc" }}
             />
           </div>
 
           <div className="mb-6">
-            <label className="block text-green-400 text-sm font-bold mb-2 tracking-widest uppercase">
+            <label className="block text-sm font-bold mb-2 tracking-widest uppercase" style={{ color: "#c084fc" }}>
               {adminMode ? "Password" : "Tournament Password"}
             </label>
             <input
@@ -98,7 +101,8 @@ export default function LoginPage({ onLogin, adminMode = false }: Props) {
               placeholder="••••••••"
               required
               autoComplete="current-password"
-              className="w-full bg-black/60 border border-green-500/40 text-white placeholder-green-900 rounded px-4 py-3 focus:outline-none focus:border-green-400 focus:ring-1 focus:ring-green-400/50 transition"
+              className="w-full bg-black/60 text-white rounded px-4 py-3 focus:outline-none transition"
+              style={{ border: "1px solid rgba(192,132,252,0.4)", caretColor: "#c084fc" }}
             />
             {!adminMode && (
               <p className="text-white/30 text-xs mt-1">
@@ -116,7 +120,8 @@ export default function LoginPage({ onLogin, adminMode = false }: Props) {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-green-500 hover:bg-green-400 disabled:opacity-50 text-black font-black py-3 rounded tracking-widest text-lg transition-all hover:shadow-[0_0_20px_rgba(74,222,128,0.5)] uppercase"
+            className="w-full disabled:opacity-50 text-black font-black py-3 rounded tracking-widest text-lg transition-all uppercase"
+            style={{ background: "linear-gradient(135deg, #c084fc, #a855f7)", boxShadow: loading ? "none" : "0 0 20px rgba(192,132,252,0.4)" }}
           >
             {loading ? "Logging in..." : adminMode ? "Access Admin Panel" : "Join Tournament"}
           </button>

@@ -1,0 +1,50 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "s-3iDTukXi1pwO9rGa3RU"
+uri = "file://artifacts/zombie-shooter/public/assets/background.png"
+type = "image"
+title = "minara ai background"
+
+[[generated]]
+id = "I2_4avLB4EtI-d-dLhrnC"
+uri = "file://artifacts/zombie-shooter/public/assets/shooter.png"
+type = "image"
+title = "minara ai shooter character"
+
+[[generated]]
+id = "34pWkY9om-Ef2yz7QGVKk"
+uri = "file://artifacts/zombie-shooter/public/assets/zombie.png"
+type = "image"
+title = "minara ai enemy bot"
+
+[[generated]]
+id = "_iaZ-LhSnKT14jy8jYqL7"
+uri = "file://artifacts/zombie-shooter/public/assets/characters/minara-core.png"
+type = "image"
+title = "minara core character"
+
+[[generated]]
+id = "MV25PXcx1WOclv8pDuVtQ"
+uri = "file://artifacts/zombie-shooter/public/assets/characters/minara-hacker.png"
+type = "image"
+title = "minara hacker character"
+
+[[generated]]
+id = "eKtzJlaipKYbnkiORXTWQ"
+uri = "file://artifacts/zombie-shooter/public/assets/characters/minara-arcane.png"
+type = "image"
+title = "minara arcane character"
+
+[[generated]]
+id = "Kc09S83wNuTiUHk25PQ1y"
+uri = "file://artifacts/zombie-shooter/public/assets/characters/minara-cyber.png"
+type = "image"
+title = "minara cyber character"
+
+[[generated]]
+id = "g_0fnWLkEugPashawYwQ6"
+uri = "file://artifacts/zombie-shooter/public/assets/characters/minara-commander.png"
+type = "image"
+title = "minara commander character"
