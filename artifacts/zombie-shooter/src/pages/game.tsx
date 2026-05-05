@@ -116,41 +116,43 @@ function LiveLeaderboard({ entries, myUsername, tournament, tournamentStatus }: 
   const isEnded = tournamentStatus === "ended" || (tournament ? new Date(tournament.endTime) <= new Date() : false);
 
   return (
-    <div className="flex flex-col h-full overflow-hidden rounded-lg" style={{ background: "rgba(10,0,30,0.88)", border: "1px solid rgba(192,132,252,0.2)" }}>
-      <div className="px-3 py-2 border-b flex-shrink-0" style={{ background: "rgba(40,0,80,0.5)", borderColor: "rgba(192,132,252,0.2)" }}>
-        <p className="font-black tracking-widest text-xs uppercase" style={{ color: "#c084fc" }}>🤖 Leaderboard</p>
+    <div className="flex flex-col h-full overflow-hidden rounded-lg" style={{ background: "#F2EDE3", border: "1.5px solid #1C1A18" }}>
+      <div className="px-3 py-2 border-b flex-shrink-0" style={{ background: "#1C1A18", borderColor: "#1C1A18" }}>
+        <p className="font-black tracking-widest text-xs uppercase" style={{ color: "#EDE8DC" }}>🤖 Leaderboard</p>
         {tournament && (
           isEnded
-            ? <p className="text-red-400 text-xs font-bold mt-0.5">🔴 ENDED · Final Scores</p>
-            : <p className="text-white/40 text-xs font-mono mt-0.5 truncate">{timeLeft} left</p>
+            ? <p className="text-xs font-bold mt-0.5" style={{ color: "#E8729A" }}>🔴 ENDED · Final Scores</p>
+            : <p className="text-xs font-mono mt-0.5 truncate" style={{ color: "rgba(237,232,220,0.6)" }}>{timeLeft} left</p>
         )}
       </div>
       <div className="flex-1 overflow-y-auto">
         {entries.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-white/20 text-xs text-center px-3 py-8">
+          <div className="flex flex-col items-center justify-center h-full text-xs text-center px-3 py-8" style={{ color: "#C8C3BA" }}>
             <span className="text-2xl mb-2">🤖</span>No scores yet
           </div>
         ) : entries.map((e) => {
           const isMe = e.discordUsername === myUsername;
           return (
             <div key={e.discordUsername}
-              className={`flex items-center gap-2 px-3 py-2 border-b border-white/5 ${isMe ? "bg-purple-900/25" : ""}`}>
-              <span className={`text-sm w-6 text-center flex-shrink-0 font-black ${RANK_COLOR[e.rank] ?? "text-white/40"}`}>
+              className={`flex items-center gap-2 px-3 py-2 border-b`}
+              style={{ borderColor: "#D4CFC4", background: isMe ? "rgba(232,114,154,0.1)" : "transparent" }}>
+              <span className={`text-sm w-6 text-center flex-shrink-0 font-black ${RANK_COLOR[e.rank] ?? ""}`}
+                style={!RANK_COLOR[e.rank] ? { color: "#C8C3BA" } : {}}>
                 {RANK_MEDAL[e.rank] ?? `#${e.rank}`}
               </span>
               <div className="flex-1 min-w-0">
-                <p className={`text-xs font-bold truncate ${isMe ? "text-purple-400" : "text-white/80"}`}>
-                  {e.discordUsername}{isMe && <span className="text-purple-600 ml-1">←</span>}
+                <p className="text-xs font-bold truncate" style={{ color: isMe ? "#E8729A" : "#1C1A18" }}>
+                  {e.discordUsername}{isMe && <span className="ml-1" style={{ color: "#E8729A" }}>←</span>}
                 </p>
-                <p className="text-white/30 text-[10px]">{e.gamesPlayed}× played</p>
+                <p className="text-[10px]" style={{ color: "#C8C3BA" }}>{e.gamesPlayed}× played</p>
               </div>
-              <span className="text-yellow-400 font-black text-sm flex-shrink-0">{e.bestScore}</span>
+              <span className="font-black text-sm flex-shrink-0" style={{ color: "#1C1A18" }}>{e.bestScore}</span>
             </div>
           );
         })}
       </div>
-      <div className="px-3 py-1.5 border-t border-white/5 flex-shrink-0">
-        <p className="text-white/20 text-[10px] text-center">Refreshes every 10s</p>
+      <div className="px-3 py-1.5 border-t flex-shrink-0" style={{ borderColor: "#D4CFC4" }}>
+        <p className="text-[10px] text-center" style={{ color: "#C8C3BA" }}>Refreshes every 10s</p>
       </div>
     </div>
   );
@@ -834,46 +836,47 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
   const renderSidebar = () => (
     <>
       {!loggedIn ? (
-        <div className="flex flex-col h-full overflow-hidden rounded-lg" style={{ background: "rgba(10,0,30,0.92)", border: "1px solid rgba(192,132,252,0.3)" }}>
-          <div className="px-3 py-2 border-b flex-shrink-0 flex items-center justify-between" style={{ background: "rgba(40,0,80,0.5)", borderColor: "rgba(192,132,252,0.2)" }}>
-            <p className="font-black tracking-widest text-xs uppercase" style={{ color: "#c084fc" }}>🔐 Login to Play</p>
-            {isMobile && <button onClick={() => setShowSidebar(false)} className="text-white/40 text-lg leading-none">×</button>}
+        <div className="flex flex-col h-full overflow-hidden rounded-lg" style={{ background: "#F2EDE3", border: "1.5px solid #1C1A18" }}>
+          <div className="px-3 py-2 border-b flex-shrink-0 flex items-center justify-between" style={{ background: "#1C1A18", borderColor: "#1C1A18" }}>
+            <p className="font-black tracking-widest text-xs uppercase" style={{ color: "#EDE8DC" }}>🔐 Login to Play</p>
+            {isMobile && <button onClick={() => setShowSidebar(false)} style={{ color: "#EDE8DC" }} className="text-lg leading-none">×</button>}
           </div>
           <form onSubmit={handleSidebarLogin} className="p-3 space-y-2.5 flex-shrink-0">
             <div>
-              <label className="block text-[10px] font-bold mb-1 tracking-widest uppercase" style={{ color: "rgba(192,132,252,0.7)" }}>Discord Username</label>
+              <label className="block text-[10px] font-bold mb-1 tracking-widest uppercase" style={{ color: "#1C1A18" }}>Discord Username</label>
               <input type="text" value={loginUsername} onChange={e => setLoginUsername(e.target.value)}
                 placeholder="Username" required autoComplete="username"
-                className="w-full bg-black/60 text-white placeholder-white/20 rounded px-2 py-1.5 text-xs focus:outline-none transition"
-                style={{ border: "1px solid rgba(192,132,252,0.3)" }} />
+                className="w-full rounded px-2 py-1.5 text-xs focus:outline-none transition placeholder-stone-400"
+                style={{ border: "1.5px solid #1C1A18", background: "#FFFFFF", color: "#1C1A18" }} />
             </div>
             <div>
-              <label className="block text-[10px] font-bold mb-1 tracking-widest uppercase" style={{ color: "rgba(192,132,252,0.7)" }}>Password</label>
+              <label className="block text-[10px] font-bold mb-1 tracking-widest uppercase" style={{ color: "#1C1A18" }}>Password</label>
               <input type="password" value={loginPassword} onChange={e => setLoginPassword(e.target.value)}
                 placeholder="••••••••" required autoComplete="current-password"
-                className="w-full bg-black/60 text-white placeholder-white/20 rounded px-2 py-1.5 text-xs focus:outline-none transition"
-                style={{ border: "1px solid rgba(192,132,252,0.3)" }} />
+                className="w-full rounded px-2 py-1.5 text-xs focus:outline-none transition placeholder-stone-400"
+                style={{ border: "1.5px solid #1C1A18", background: "#FFFFFF", color: "#1C1A18" }} />
             </div>
-            {loginError && <p className="text-red-400 text-[10px] bg-red-900/20 border border-red-500/20 rounded p-1.5">{loginError}</p>}
+            {loginError && <p className="text-red-600 text-[10px] bg-red-50 border border-red-300 rounded p-1.5">{loginError}</p>}
             <button type="submit" disabled={loginLoading}
-              className="w-full text-black font-black py-2 rounded text-xs tracking-widest uppercase transition disabled:opacity-50"
-              style={{ background: "linear-gradient(135deg, #c084fc, #a855f7)" }}>
+              className="w-full font-black py-2 rounded text-xs tracking-widest uppercase transition disabled:opacity-50"
+              style={{ background: "#1C1A18", color: "#EDE8DC" }}>
               {loginLoading ? "Logging in..." : "Login"}
             </button>
           </form>
-          <div className="flex-1 overflow-y-auto border-t" style={{ borderColor: "rgba(192,132,252,0.15)" }}>
-            <div className="px-3 py-1.5 border-b" style={{ background: "rgba(40,0,80,0.4)", borderColor: "rgba(192,132,252,0.15)" }}>
-              <p className="text-[10px] font-black tracking-widest uppercase" style={{ color: "rgba(192,132,252,0.6)" }}>🤖 Leaderboard</p>
+          <div className="flex-1 overflow-y-auto border-t" style={{ borderColor: "#D4CFC4" }}>
+            <div className="px-3 py-1.5 border-b" style={{ background: "#E8E2D6", borderColor: "#D4CFC4" }}>
+              <p className="text-[10px] font-black tracking-widest uppercase" style={{ color: "#1C1A18" }}>🤖 Leaderboard</p>
             </div>
             {leaderboard.length === 0 ? (
-              <div className="text-white/20 text-[10px] text-center py-4">🤖 No scores yet</div>
+              <div className="text-[10px] text-center py-4" style={{ color: "#C8C3BA" }}>🤖 No scores yet</div>
             ) : leaderboard.map(e => (
-              <div key={e.discordUsername} className="flex items-center gap-1.5 px-3 py-1.5 border-b border-white/5">
-                <span className={`text-[10px] w-5 text-center flex-shrink-0 font-black ${RANK_COLOR[e.rank] ?? "text-white/40"}`}>
+              <div key={e.discordUsername} className="flex items-center gap-1.5 px-3 py-1.5 border-b" style={{ borderColor: "#D4CFC4" }}>
+                <span className={`text-[10px] w-5 text-center flex-shrink-0 font-black ${RANK_COLOR[e.rank] ?? ""}`}
+                  style={!RANK_COLOR[e.rank] ? { color: "#C8C3BA" } : {}}>
                   {RANK_MEDAL[e.rank] ?? `#${e.rank}`}
                 </span>
-                <p className="flex-1 min-w-0 text-[10px] text-white/60 truncate">{e.discordUsername}</p>
-                <span className="text-yellow-400 font-black text-[10px] flex-shrink-0">{e.bestScore}</span>
+                <p className="flex-1 min-w-0 text-[10px] truncate" style={{ color: "#1C1A18" }}>{e.discordUsername}</p>
+                <span className="font-black text-[10px] flex-shrink-0" style={{ color: "#1C1A18" }}>{e.bestScore}</span>
               </div>
             ))}
           </div>
@@ -882,7 +885,7 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
         <div className="h-full">
           {isMobile && (
             <div className="flex justify-end mb-1">
-              <button onClick={() => setShowSidebar(false)} className="text-white/40 text-lg leading-none px-2">×</button>
+              <button onClick={() => setShowSidebar(false)} style={{ color: "#1C1A18" }} className="text-lg leading-none px-2">×</button>
             </div>
           )}
           <LiveLeaderboard entries={leaderboard} myUsername={user?.discordUsername ?? ""} tournament={tournament} tournamentStatus={tournamentStatus} />
@@ -892,29 +895,28 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
   );
 
   return (
-    <div className="flex flex-col bg-black text-white overflow-hidden" style={{ height: "100dvh", userSelect: "none" }}>
+    <div className="flex flex-col overflow-hidden" style={{ height: "100dvh", userSelect: "none", background: "#EDE8DC", color: "#1C1A18" }}>
 
       {/* Header */}
-      <div className="flex items-center justify-between px-3 py-2 border-b flex-shrink-0 gap-2"
-        style={{ borderColor: "rgba(192,132,252,0.15)", background: "rgba(5,0,20,0.95)" }}>
-        <span className="font-bold text-xs truncate min-w-0" style={{ color: "#c084fc" }}>
-          {loggedIn ? user?.discordUsername : <span className="text-white/30 italic">Not logged in</span>}
+      <div className="flex items-center justify-between px-4 py-2.5 border-b flex-shrink-0 gap-2"
+        style={{ borderColor: "#C8C3BA", background: "#EDE8DC" }}>
+        <span className="font-bold text-xs truncate min-w-0" style={{ color: "#1C1A18" }}>
+          {loggedIn ? user?.discordUsername : <span style={{ color: "#C8C3BA" }} className="italic">Not logged in</span>}
         </span>
-        <h1 className="font-black tracking-widest text-xs sm:text-sm flex-shrink-0"
-          style={{ color: "#c084fc", textShadow: "0 0 12px rgba(192,132,252,0.6)" }}>
-          🤖 MINARA AI DEFENDER
-        </h1>
         <div className="flex items-center gap-2 flex-shrink-0">
-          {/* Mobile sidebar toggle */}
+          <span className="font-black tracking-wider text-xs sm:text-sm" style={{ fontFamily: "'Playfair Display', serif", color: "#1C1A18" }}>MINARA</span>
+          <span className="text-xs font-bold tracking-widest" style={{ color: "#C8C3BA" }}>AI DEFENDER</span>
+        </div>
+        <div className="flex items-center gap-2 flex-shrink-0">
           {isMobile && (
             <button onClick={() => setShowSidebar(v => !v)}
-              className="text-xs px-2 py-0.5 rounded" style={{ color: "rgba(192,132,252,0.7)", border: "1px solid rgba(192,132,252,0.3)" }}>
+              className="text-xs px-2 py-0.5 rounded font-bold" style={{ color: "#1C1A18", border: "1.5px solid #1C1A18" }}>
               {loggedIn ? "🏆" : "🔐"}
             </button>
           )}
           {loggedIn ? (
             <button onClick={() => { clearAuth(); onLogout(); }}
-              className="text-white/30 text-xs hover:text-white/60 transition">
+              className="text-xs font-bold hover:underline transition" style={{ color: "#C8C3BA" }}>
               Logout
             </button>
           ) : (
@@ -923,27 +925,26 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
         </div>
       </div>
 
-      {/* Tournament banner — only shown to logged-in users */}
+      {/* Tournament banner */}
       {loggedIn && (tournament || tournamentStatus === "none") && (
-        <div className="text-center py-1 px-2 flex-shrink-0">
+        <div className="text-center py-1 px-2 flex-shrink-0" style={{ background: "#E8E2D6", borderBottom: "1px solid #D4CFC4" }}>
           {tournament ? (
-            <span className={`text-xs font-bold px-3 py-0.5 rounded ${
-              canPlay ? "bg-purple-500/15 text-purple-400"
-              : tournamentStatus === "ended" ? "bg-red-500/15 text-red-400"
-              : "bg-yellow-500/15 text-yellow-400"
-            }`}>
+            <span className="text-xs font-bold px-3 py-0.5 rounded" style={{
+              background: canPlay ? "#1C1A18" : tournamentStatus === "ended" ? "#fee2e2" : "#fef9c3",
+              color: canPlay ? "#EDE8DC" : tournamentStatus === "ended" ? "#b91c1c" : "#854d0e"
+            }}>
               {canPlay ? `🟢 ${tournament.name} · ${timeLeft} left`
                 : tournamentStatus === "ended" ? `🔴 ${tournament.name} — ENDED`
                 : `⏳ ${tournament.name} — starts soon`}
             </span>
           ) : (
-            <span className="text-xs text-white/20">No active tournament</span>
+            <span className="text-xs" style={{ color: "#C8C3BA" }}>No active tournament</span>
           )}
         </div>
       )}
 
       {devtoolsWarning && (
-        <div className="mx-3 flex-shrink-0 text-center text-xs text-red-400 bg-red-900/20 border border-red-500/30 rounded py-1 px-3">
+        <div className="mx-3 flex-shrink-0 text-center text-xs text-red-600 bg-red-50 border border-red-300 rounded py-1 px-3">
           ⛔ Developer tools detected — session invalidated.
         </div>
       )}
@@ -995,145 +996,140 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
 
               {/* Menu */}
               {gameState === "menu" && (
-                <div className="absolute inset-0 rounded-lg flex items-center justify-center overflow-hidden" style={overlayBg}>
-                  {/* Dark overlay */}
-                  <div className="absolute inset-0 rounded-lg" style={{ background: "rgba(3,0,15,0.82)" }} />
-                  {/* Poster glow rays */}
-                  <div className="absolute inset-0 rounded-lg" style={{ background: "radial-gradient(ellipse 70% 60% at 50% 30%, rgba(192,132,252,0.12) 0%, transparent 70%)" }} />
+                <div className="absolute inset-0 rounded-lg flex overflow-hidden" style={{ background: "#EDE8DC" }}>
+                  {/* Minara mascot — top right, like the website */}
+                  <img
+                    src="/assets/minara-mascot.png"
+                    alt="Minara"
+                    className="absolute pointer-events-none select-none"
+                    style={{ right: 0, top: 0, height: "65%", opacity: 0.85, objectFit: "contain", objectPosition: "top right" }}
+                  />
 
-                  <div className="relative z-10 w-full max-w-lg mx-2 flex flex-col items-center">
-
-                    {/* ── POSTER HEADER ── */}
-                    <p className="text-[10px] sm:text-xs font-black tracking-[0.3em] mb-1" style={{ color: "rgba(192,132,252,0.55)" }}>
-                      MINARA AI PRESENTS
-                    </p>
-                    <div className="text-center leading-none mb-0.5">
-                      <span className="block font-black tracking-[0.25em] text-4xl sm:text-5xl"
-                        style={{ color: "#c084fc", textShadow: "0 0 40px rgba(192,132,252,0.9), 0 0 80px rgba(168,85,247,0.4)" }}>
-                        MINARA AI
-                      </span>
-                      <span className="block font-black tracking-[0.15em] text-2xl sm:text-3xl text-white mt-0.5"
-                        style={{ textShadow: "0 0 20px rgba(255,255,255,0.3)" }}>
-                        ZOMBIE DEFENDER
-                      </span>
-                    </div>
-                    <div className="flex gap-1 mb-3 mt-1">
-                      {[...Array(5)].map((_, i) => <span key={i} className="text-yellow-400 text-xs">★</span>)}
-                    </div>
-
-                    {/* ── SELECTED SHOOTER PREVIEW ── */}
-                    <div className="flex justify-center items-end mb-1" style={{ height: 130 }}>
-                      <div style={{ position: "relative", width: 110, height: 130 }}>
-                        {/* glow halo behind sprite */}
-                        <div style={{
-                          position: "absolute", inset: 0,
-                          borderRadius: "50%",
-                          background: `radial-gradient(ellipse at 50% 80%, ${CHARACTERS[selectedChar].color}55 0%, transparent 70%)`,
-                          filter: "blur(8px)",
-                        }} />
-                        <img
-                          key={CHARACTERS[selectedChar].shooterSrc}
-                          src={CHARACTERS[selectedChar].shooterSrc}
-                          alt={CHARACTERS[selectedChar].name}
-                          style={{
-                            position: "relative",
-                            width: "100%", height: "100%",
-                            objectFit: "contain",
-                            filter: `drop-shadow(0 0 12px ${CHARACTERS[selectedChar].color}99)`,
-                            transition: "opacity 0.2s",
-                          }}
-                        />
-                      </div>
-                    </div>
-
-                    {/* ── CHARACTER SELECT ── */}
-                    <div className="w-full rounded-xl border mb-3 overflow-hidden"
-                      style={{ background: "rgba(8,0,20,0.85)", borderColor: "rgba(192,132,252,0.2)" }}>
-                      <p className="text-[10px] font-black tracking-widest uppercase text-center py-1.5"
-                        style={{ color: "rgba(192,132,252,0.6)", background: "rgba(40,0,80,0.5)", borderBottom: "1px solid rgba(192,132,252,0.15)" }}>
-                        ⚡ Choose Your AI
+                  {/* Content */}
+                  <div className="relative z-10 w-full flex flex-col justify-between p-5 sm:p-7">
+                    {/* Top: branding */}
+                    <div>
+                      <p className="text-[10px] sm:text-xs font-bold tracking-[0.3em] mb-2" style={{ color: "#C8C3BA" }}>
+                        MINARA AI PRESENTS
                       </p>
-                      <div className="flex justify-center gap-2 p-3 flex-wrap">
-                        {CHARACTERS.map((c, i) => (
-                          <button
-                            key={c.id}
-                            onClick={() => { setSelectedChar(i); selectedCharRef.current = i; }}
-                            title={c.name}
-                            className="flex flex-col items-center gap-1 transition-all"
-                            style={{ outline: "none" }}
-                          >
-                            <div className="rounded-xl overflow-hidden transition-all"
-                              style={{
-                                width: 60, height: 60,
-                                border: selectedChar === i ? `3px solid ${c.color}` : "3px solid rgba(255,255,255,0.08)",
-                                boxShadow: selectedChar === i ? `0 0 16px ${c.color}88` : "none",
-                                background: c.bg,
-                                transform: selectedChar === i ? "scale(1.12)" : "scale(1)",
-                              }}>
-                              <img
-                                src={c.src}
-                                alt={c.name}
-                                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-                              />
-                            </div>
-                            <span className="text-[9px] font-bold tracking-wide"
-                              style={{ color: selectedChar === i ? c.color : "rgba(255,255,255,0.35)" }}>
-                              {c.name}
-                            </span>
-                          </button>
-                        ))}
+                      <div className="mb-1">
+                        <span className="block font-black tracking-tight leading-none"
+                          style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(2rem, 6vw, 3.5rem)", color: "#1C1A18" }}>
+                          Zombie
+                        </span>
+                        <span className="block font-black tracking-tight leading-none"
+                          style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(2rem, 6vw, 3.5rem)", color: "#1C1A18", fontStyle: "italic" }}>
+                          Defender
+                        </span>
                       </div>
+                      <p className="text-xs sm:text-sm mt-2" style={{ color: "#C8C3BA", maxWidth: 260 }}>
+                        Defend the AI frontier. Shoot the corrupted bots.
+                      </p>
                     </div>
 
-                    {/* ── CONTROLS HINT ── */}
-                    {isMobile ? (
-                      <p className="text-white/35 text-[11px] mb-3">Hold ◀ ▶ to move · gun fires automatically</p>
-                    ) : (
-                      <p className="text-white/35 text-[11px] mb-3">
-                        <kbd className="bg-white/10 px-1 py-0.5 rounded text-white/70">A</kbd>{" / "}
-                        <kbd className="bg-white/10 px-1 py-0.5 rounded text-white/70">D</kbd>{" or arrows to move · "}
-                        <kbd className="bg-white/10 px-1 py-0.5 rounded text-white/70">Click</kbd>{" to shoot"}
-                      </p>
-                    )}
-
-                    {/* ── PLAY BUTTONS ── */}
-                    <div className="w-full flex flex-col gap-2">
-                      {loggedIn && canPlay && (
-                        <button onClick={startGame}
-                          className="font-black py-3 rounded-xl text-base tracking-widest uppercase text-black transition w-full"
-                          style={{ background: `linear-gradient(135deg, ${CHARACTERS[selectedChar].color}, #a855f7)`, boxShadow: `0 0 24px ${CHARACTERS[selectedChar].color}66` }}>
-                          🤖 Launch Defense
-                        </button>
-                      )}
-                      {loggedIn && !canPlay && (
-                        <div className={`text-sm border-2 px-6 py-3 rounded-xl text-center font-black tracking-widest uppercase ${
-                          tournamentStatus === "upcoming"
-                            ? "text-yellow-300 border-yellow-400/60 bg-yellow-500/15 shadow-[0_0_18px_rgba(250,204,21,0.25)] animate-pulse"
-                            : tournamentStatus === "ended"
-                            ? "text-red-300 border-red-500/30 bg-red-900/10"
-                            : "text-white/30 border-white/10"
-                        }`}>
-                          {tournamentStatus === "upcoming"
-                            ? `⏳ ${timeLeft} until start`
-                            : tournamentStatus === "ended"
-                            ? "🏆 Tournament ended · Check the final leaderboard →"
-                            : "No active tournament"}
+                    {/* Bottom: character select + play */}
+                    <div className="w-full max-w-sm">
+                      {/* Selected character preview */}
+                      <div className="flex items-end gap-4 mb-4">
+                        <div style={{ width: 80, height: 90, flexShrink: 0, position: "relative" }}>
+                          <img
+                            key={CHARACTERS[selectedChar].shooterSrc}
+                            src={CHARACTERS[selectedChar].shooterSrc}
+                            alt={CHARACTERS[selectedChar].name}
+                            style={{ width: "100%", height: "100%", objectFit: "contain" }}
+                          />
                         </div>
-                      )}
-                      {!loggedIn && (
-                        <button onClick={startDemoGame}
-                          className="font-black py-2.5 rounded-xl text-sm tracking-widest uppercase border transition w-full"
-                          style={{ background: "rgba(255,255,255,0.04)", borderColor: "rgba(192,132,252,0.25)", color: "rgba(192,132,252,0.75)" }}>
-                          🎮 Play Demo
-                        </button>
-                      )}
-                      {!loggedIn && (
-                        <p className="text-white/20 text-[10px] text-center">
-                          Scores not saved ·{" "}
-                          <span className="cursor-pointer" style={{ color: "rgba(192,132,252,0.5)" }} onClick={() => setShowSidebar(true)}>Login</span>{" "}
-                          to compete
+                        <div>
+                          <p className="text-[10px] font-bold tracking-widest uppercase mb-0.5" style={{ color: "#C8C3BA" }}>Selected</p>
+                          <p className="font-black text-base" style={{ color: "#1C1A18", fontFamily: "'Playfair Display', serif" }}>{CHARACTERS[selectedChar].name}</p>
+                        </div>
+                      </div>
+
+                      {/* Character select grid */}
+                      <div className="rounded-xl border overflow-hidden mb-3" style={{ borderColor: "#C8C3BA", background: "#F2EDE3" }}>
+                        <p className="text-[10px] font-black tracking-widest uppercase text-center py-1.5 border-b"
+                          style={{ color: "#1C1A18", background: "#E8E2D6", borderColor: "#C8C3BA" }}>
+                          ⚡ Choose Your AI
+                        </p>
+                        <div className="flex justify-center gap-2 p-3 flex-wrap">
+                          {CHARACTERS.map((c, i) => (
+                            <button
+                              key={c.id}
+                              onClick={() => { setSelectedChar(i); selectedCharRef.current = i; }}
+                              title={c.name}
+                              className="flex flex-col items-center gap-1 transition-all"
+                              style={{ outline: "none" }}
+                            >
+                              <div className="rounded-lg overflow-hidden transition-all"
+                                style={{
+                                  width: 52, height: 52,
+                                  border: selectedChar === i ? "2.5px solid #1C1A18" : "2px solid #D4CFC4",
+                                  background: "#FFFFFF",
+                                  transform: selectedChar === i ? "scale(1.1)" : "scale(1)",
+                                  boxShadow: selectedChar === i ? "0 2px 8px rgba(28,26,24,0.18)" : "none",
+                                }}>
+                                <img src={c.src} alt={c.name} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                              </div>
+                              <span className="text-[9px] font-bold"
+                                style={{ color: selectedChar === i ? "#1C1A18" : "#C8C3BA" }}>
+                                {c.name}
+                              </span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Controls hint */}
+                      {isMobile ? (
+                        <p className="text-[11px] mb-3" style={{ color: "#C8C3BA" }}>Hold ◀ ▶ to move · gun fires automatically</p>
+                      ) : (
+                        <p className="text-[11px] mb-3" style={{ color: "#C8C3BA" }}>
+                          <kbd className="px-1 py-0.5 rounded text-xs font-bold" style={{ background: "#E8E2D6", color: "#1C1A18", border: "1px solid #C8C3BA" }}>A</kbd>{" / "}
+                          <kbd className="px-1 py-0.5 rounded text-xs font-bold" style={{ background: "#E8E2D6", color: "#1C1A18", border: "1px solid #C8C3BA" }}>D</kbd>
+                          {" or arrows to move · "}
+                          <kbd className="px-1 py-0.5 rounded text-xs font-bold" style={{ background: "#E8E2D6", color: "#1C1A18", border: "1px solid #C8C3BA" }}>Click</kbd>
+                          {" to shoot"}
                         </p>
                       )}
+
+                      {/* Play buttons */}
+                      <div className="flex flex-col gap-2">
+                        {loggedIn && canPlay && (
+                          <button onClick={startGame}
+                            className="font-black py-3 rounded-lg text-sm tracking-widest uppercase transition w-full"
+                            style={{ background: "#1C1A18", color: "#EDE8DC" }}>
+                            → Launch Defense
+                          </button>
+                        )}
+                        {loggedIn && !canPlay && (
+                          <div className="text-sm px-6 py-3 rounded-lg text-center font-black tracking-widest uppercase border"
+                            style={{
+                              background: tournamentStatus === "upcoming" ? "#fef9c3" : tournamentStatus === "ended" ? "#fee2e2" : "#F2EDE3",
+                              borderColor: tournamentStatus === "upcoming" ? "#ca8a04" : tournamentStatus === "ended" ? "#dc2626" : "#C8C3BA",
+                              color: tournamentStatus === "upcoming" ? "#854d0e" : tournamentStatus === "ended" ? "#b91c1c" : "#C8C3BA",
+                            }}>
+                            {tournamentStatus === "upcoming"
+                              ? `⏳ ${timeLeft} until start`
+                              : tournamentStatus === "ended"
+                              ? "🏆 Tournament ended · Check leaderboard →"
+                              : "No active tournament"}
+                          </div>
+                        )}
+                        {!loggedIn && (
+                          <button onClick={startDemoGame}
+                            className="font-black py-2.5 rounded-lg text-sm tracking-widest uppercase border transition w-full"
+                            style={{ background: "transparent", borderColor: "#1C1A18", color: "#1C1A18" }}>
+                            🎮 Play Demo
+                          </button>
+                        )}
+                        {!loggedIn && (
+                          <p className="text-[10px] text-center" style={{ color: "#C8C3BA" }}>
+                            Scores not saved ·{" "}
+                            <span className="cursor-pointer underline" style={{ color: "#1C1A18" }} onClick={() => setShowSidebar(true)}>Login</span>
+                            {" "}to compete
+                          </p>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1141,42 +1137,42 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
 
               {/* Game Over */}
               {gameState === "over" && (
-                <div className="absolute inset-0 rounded-lg flex items-center justify-center" style={overlayBg}>
-                  <div className="absolute inset-0 rounded-lg" style={{ background: "rgba(0,0,10,0.8)" }} />
-                  <div className="relative z-10 rounded-xl p-5 sm:p-10 text-center w-72 sm:w-80 border"
-                    style={{ background: "rgba(0,5,20,0.92)", borderColor: tournamentEndedWhilePlaying ? "rgba(255,180,0,0.4)" : "rgba(255,50,50,0.35)" }}>
+                <div className="absolute inset-0 rounded-lg flex items-center justify-center" style={{ background: "#EDE8DC" }}>
+                  <div className="relative z-10 rounded-xl p-6 sm:p-10 text-center w-72 sm:w-80 border"
+                    style={{ background: "#F2EDE3", borderColor: tournamentEndedWhilePlaying ? "#ca8a04" : "#1C1A18", borderWidth: "1.5px" }}>
                     {tournamentEndedWhilePlaying ? (
-                      <h2 className="text-2xl sm:text-3xl font-black tracking-widest mb-2 text-yellow-400">🏆 TOURNAMENT<br/>ENDED!</h2>
+                      <h2 className="text-2xl sm:text-3xl font-black tracking-widest mb-2" style={{ fontFamily: "'Playfair Display', serif", color: "#854d0e" }}>🏆 TOURNAMENT<br/>ENDED!</h2>
                     ) : (
-                      <h2 className="text-3xl sm:text-4xl font-black tracking-widest mb-2 text-red-400">GAME OVER</h2>
+                      <h2 className="text-3xl sm:text-4xl font-black tracking-widest mb-2" style={{ fontFamily: "'Playfair Display', serif", color: "#1C1A18" }}>Game Over</h2>
                     )}
-                    <p className="text-5xl sm:text-6xl font-black text-yellow-400 my-3">{score}</p>
-                    <p className="text-white/40 text-sm mb-5">Final Score</p>
+                    <p className="font-black my-3" style={{ fontSize: "3.5rem", color: "#1C1A18", fontFamily: "'Playfair Display', serif" }}>{score}</p>
+                    <p className="text-sm mb-5" style={{ color: "#C8C3BA" }}>Final Score</p>
                     {devtoolsWarning && (
-                      <p className="text-red-400 text-xs mb-4 bg-red-900/20 border border-red-500/20 rounded p-2">
+                      <p className="text-red-600 text-xs mb-4 bg-red-50 border border-red-300 rounded p-2">
                         Score invalidated — DevTools detected.
                       </p>
                     )}
 
-                    {/* Score submission status — tournament mode only */}
+                    {/* Score submission status */}
                     {playMode === "tournament" && !devtoolsWarning && (
                       <div className="mb-4">
                         {submitting && (
-                          <p className="text-purple-400 text-xs bg-purple-900/20 border border-purple-500/20 rounded px-3 py-2 animate-pulse">
+                          <p className="text-xs rounded px-3 py-2 animate-pulse" style={{ color: "#1C1A18", background: "#E8E2D6", border: "1px solid #C8C3BA" }}>
                             ⏳ Saving your score...
                           </p>
                         )}
                         {submitted && !submitting && (
-                          <p className="text-green-400 text-xs bg-green-900/20 border border-green-500/20 rounded px-3 py-2">
+                          <p className="text-xs bg-green-50 border border-green-300 text-green-700 rounded px-3 py-2">
                             ✅ Score saved to leaderboard!
                           </p>
                         )}
                         {submitError && !submitting && !submitted && (
-                          <div className="text-red-400 text-xs bg-red-900/20 border border-red-500/20 rounded px-3 py-2">
+                          <div className="text-red-600 text-xs bg-red-50 border border-red-300 rounded px-3 py-2">
                             <p className="mb-2">❌ {submitError}</p>
                             <button
                               onClick={autoSubmitScore}
-                              className="w-full bg-red-500/20 hover:bg-red-500/30 text-red-300 font-bold py-1.5 rounded tracking-wider uppercase text-xs transition">
+                              className="w-full font-bold py-1.5 rounded tracking-wider uppercase text-xs transition"
+                              style={{ background: "#1C1A18", color: "#EDE8DC" }}>
                               Retry Submit
                             </button>
                           </div>
@@ -1186,29 +1182,32 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
 
                     {playMode === "demo" ? (
                       <div className="mb-4">
-                        <p className="text-white/40 text-xs mb-3 border border-white/10 rounded px-3 py-2">
+                        <p className="text-xs mb-3 rounded px-3 py-2" style={{ color: "#C8C3BA", border: "1px solid #D4CFC4" }}>
                           🎮 Demo mode — score not saved
                         </p>
                         {!loggedIn && (
-                          <p className="text-purple-400/60 text-xs mb-3">Login to compete on the leaderboard!</p>
+                          <p className="text-xs mb-3" style={{ color: "#E8729A" }}>Login to compete on the leaderboard!</p>
                         )}
                       </div>
                     ) : null}
                     {playMode === "demo" ? (
                       <button onClick={startDemoGame}
-                        className="w-full bg-white/10 hover:bg-white/20 text-white font-bold py-2 rounded tracking-wider uppercase text-sm transition mb-2">
+                        className="w-full font-bold py-2 rounded tracking-wider uppercase text-sm transition mb-2"
+                        style={{ background: "#1C1A18", color: "#EDE8DC" }}>
                         Play Again (Demo)
                       </button>
                     ) : (
                       canPlay && !devtoolsWarning && (
                         <button onClick={startGame}
-                          className="w-full bg-white/10 hover:bg-white/20 text-white font-bold py-2 rounded tracking-wider uppercase text-sm transition mb-2">
+                          className="w-full font-bold py-2 rounded tracking-wider uppercase text-sm transition mb-2"
+                          style={{ background: "#1C1A18", color: "#EDE8DC" }}>
                           Play Again
                         </button>
                       )
                     )}
                     <button onClick={() => { setGameState("menu"); setPlayMode(null); }}
-                      className="w-full bg-white/5 hover:bg-white/10 text-white/40 font-bold py-1.5 rounded tracking-wider uppercase text-xs transition">
+                      className="w-full font-bold py-1.5 rounded tracking-wider uppercase text-xs transition"
+                      style={{ background: "transparent", color: "#C8C3BA", border: "1px solid #D4CFC4" }}>
                       Back to Menu
                     </button>
                   </div>

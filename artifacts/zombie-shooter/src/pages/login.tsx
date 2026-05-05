@@ -32,50 +32,38 @@ export default function LoginPage({ onLogin, adminMode = false }: Props) {
   }
 
   return (
-    <div
-      className="min-h-screen bg-black flex flex-col items-center justify-center p-4"
-      style={{
-        backgroundImage: "url('/assets/background.png')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
-    >
-      <div className="absolute inset-0 bg-black/70" />
-      <div className="relative z-10 w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-black tracking-widest drop-shadow-[0_0_20px_rgba(192,132,252,0.8)] mb-1"
-            style={{ color: "#c084fc" }}>
-            MINARA AI
-          </h1>
-          <h2 className="text-3xl font-black text-white tracking-widest">ZOMBIE DEFENDER</h2>
-          <p className="mt-2 tracking-wider text-sm" style={{ color: "rgba(192,132,252,0.7)" }}>
-            {adminMode ? "ADMIN ACCESS" : "TOURNAMENT"}
-          </p>
+    <div className="min-h-screen flex" style={{ background: "#EDE8DC", fontFamily: "'Inter', sans-serif" }}>
+      {/* Left — form */}
+      <div className="flex flex-col items-start justify-center px-8 sm:px-16 py-12 flex-1 max-w-lg">
+        {/* Logo */}
+        <div className="flex items-center gap-2 mb-12">
+          <img src="/assets/minara-mascot.png" alt="Minara" className="w-8 h-8 object-contain" />
+          <span className="font-black text-xl tracking-wide" style={{ fontFamily: "'Playfair Display', serif", color: "#1C1A18" }}>MINARA</span>
         </div>
 
-        <form
-          onSubmit={handleSubmit}
-          className="bg-black/80 rounded-lg p-8"
-          style={{ border: "1px solid rgba(192,132,252,0.3)", boxShadow: "0 0 40px rgba(192,132,252,0.15)" }}
-        >
+        <p className="text-xs font-bold tracking-[0.3em] mb-3" style={{ color: "#C8C3BA" }}>
+          {adminMode ? "ADMINISTRATOR" : "TOURNAMENT"}
+        </p>
+        <h1 className="font-black leading-none mb-2" style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(2.2rem, 5vw, 3rem)", color: "#1C1A18" }}>
+          {adminMode ? "Admin\nAccess" : "Join the\nDefense"}
+        </h1>
+        <p className="text-sm mb-8" style={{ color: "#C8C3BA" }}>
+          {adminMode
+            ? "Sign in to manage tournaments and players."
+            : "Enter your Discord username and the tournament password to compete."}
+        </p>
+
+        <form onSubmit={handleSubmit} className="w-full space-y-4">
           {adminMode && (
-            <div className="mb-5 text-center">
-              <span className="text-xs font-bold text-yellow-400 bg-yellow-400/10 border border-yellow-500/30 px-3 py-1 rounded-full tracking-widest">
+            <div className="mb-2 text-center">
+              <span className="text-xs font-bold bg-yellow-100 text-yellow-700 border border-yellow-300 px-3 py-1 rounded-full tracking-widest">
                 🔐 ADMINISTRATOR LOGIN
               </span>
             </div>
           )}
 
-          {!adminMode && (
-            <div className="mb-5 p-3 rounded text-center" style={{ background: "rgba(192,132,252,0.1)", border: "1px solid rgba(192,132,252,0.2)" }}>
-              <p className="text-xs tracking-wide" style={{ color: "rgba(192,132,252,0.9)" }}>
-                Enter your Discord username and the tournament password provided by the organiser
-              </p>
-            </div>
-          )}
-
-          <div className="mb-5">
-            <label className="block text-sm font-bold mb-2 tracking-widest uppercase" style={{ color: "#c084fc" }}>
+          <div>
+            <label className="block text-xs font-bold mb-1.5 tracking-widest uppercase" style={{ color: "#1C1A18" }}>
               Discord Username
             </label>
             <input
@@ -85,13 +73,13 @@ export default function LoginPage({ onLogin, adminMode = false }: Props) {
               placeholder={adminMode ? "admin" : "YourDiscordName"}
               required
               autoComplete="username"
-              className="w-full bg-black/60 text-white rounded px-4 py-3 focus:outline-none transition"
-              style={{ border: "1px solid rgba(192,132,252,0.4)", caretColor: "#c084fc" }}
+              className="w-full rounded-lg px-4 py-3 text-sm focus:outline-none transition"
+              style={{ border: "1.5px solid #1C1A18", background: "#FFFFFF", color: "#1C1A18" }}
             />
           </div>
 
-          <div className="mb-6">
-            <label className="block text-sm font-bold mb-2 tracking-widest uppercase" style={{ color: "#c084fc" }}>
+          <div>
+            <label className="block text-xs font-bold mb-1.5 tracking-widest uppercase" style={{ color: "#1C1A18" }}>
               {adminMode ? "Password" : "Tournament Password"}
             </label>
             <input
@@ -101,18 +89,18 @@ export default function LoginPage({ onLogin, adminMode = false }: Props) {
               placeholder="••••••••"
               required
               autoComplete="current-password"
-              className="w-full bg-black/60 text-white rounded px-4 py-3 focus:outline-none transition"
-              style={{ border: "1px solid rgba(192,132,252,0.4)", caretColor: "#c084fc" }}
+              className="w-full rounded-lg px-4 py-3 text-sm focus:outline-none transition"
+              style={{ border: "1.5px solid #1C1A18", background: "#FFFFFF", color: "#1C1A18" }}
             />
             {!adminMode && (
-              <p className="text-white/30 text-xs mt-1">
+              <p className="text-xs mt-1" style={{ color: "#C8C3BA" }}>
                 The password is specific to each tournament
               </p>
             )}
           </div>
 
           {error && (
-            <div className="mb-4 text-red-400 text-sm text-center bg-red-900/20 border border-red-500/30 rounded p-3">
+            <div className="text-red-600 text-sm text-center bg-red-50 border border-red-300 rounded-lg p-3">
               {error}
             </div>
           )}
@@ -120,12 +108,29 @@ export default function LoginPage({ onLogin, adminMode = false }: Props) {
           <button
             type="submit"
             disabled={loading}
-            className="w-full disabled:opacity-50 text-black font-black py-3 rounded tracking-widest text-lg transition-all uppercase"
-            style={{ background: "linear-gradient(135deg, #c084fc, #a855f7)", boxShadow: loading ? "none" : "0 0 20px rgba(192,132,252,0.4)" }}
+            className="w-full font-black py-3 rounded-lg text-sm tracking-widest uppercase transition-all disabled:opacity-50"
+            style={{ background: "#1C1A18", color: "#EDE8DC" }}
           >
-            {loading ? "Logging in..." : adminMode ? "Access Admin Panel" : "Join Tournament"}
+            {loading ? "Logging in..." : adminMode ? "Access Admin Panel" : "Join Tournament →"}
           </button>
         </form>
+      </div>
+
+      {/* Right — mascot panel */}
+      <div className="hidden sm:flex flex-1 items-end justify-center overflow-hidden relative"
+        style={{ background: "#E8E2D6", borderLeft: "1.5px solid #C8C3BA" }}>
+        <div className="absolute top-12 left-8">
+          <p className="font-black leading-tight" style={{ fontFamily: "'Playfair Display', serif", fontSize: "2.5rem", color: "#1C1A18" }}>
+            Defend the<br /><em>AI frontier.</em>
+          </p>
+          <p className="text-sm mt-3" style={{ color: "#C8C3BA" }}>Shoot the corrupted bots.<br />Climb the leaderboard.</p>
+        </div>
+        <img
+          src="/assets/minara-mascot.png"
+          alt="Minara mascot"
+          className="object-contain object-bottom select-none"
+          style={{ maxHeight: "75%", width: "auto", opacity: 0.9 }}
+        />
       </div>
     </div>
   );
