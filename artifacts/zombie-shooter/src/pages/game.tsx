@@ -370,25 +370,54 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
     requestAnimationFrame(loop);
   }
 
-  function spawnParticles(x: number, y: number) {
+  function spawnParticles(x: number, y: number, hitColor?: string) {
     const s = gs.current;
-    // Gold and green — profits booked!
-    const colors = ["#E8729A", "#fbbf24", "#f59e0b", "#fcd34d", "#22c55e", "#EDE8DC"];
-    for (let i = 0; i < 14; i++) {
-      const angle = (Math.PI * 2 * i) / 14 + Math.random() * 0.5;
-      const speed = 2.5 + Math.random() * 5;
+    const base = hitColor ?? "#E8729A";
+    // Mix bullet colour with white sparks and gold
+    const colors = [base, base, "#ffffff", "#fbbf24", base, "#ffffff"];
+    for (let i = 0; i < 18; i++) {
+      const angle = (Math.PI * 2 * i) / 18 + Math.random() * 0.4;
+      const speed = 2.0 + Math.random() * 7;
       s.particles.push({
         x, y,
         vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
         life: 1, maxLife: 1,
-        r: 3 + Math.random() * 5,
+        r: 2 + Math.random() * 5,
         color: colors[Math.floor(Math.random() * colors.length)],
       });
     }
   }
 
+  // Per-character bullet colours (match CHARACTERS color field)
+  const CHAR_COLORS: Record<string, string> = {
+    bluekid:    "#38bdf8",
+    glassygirl: "#e879f9",
+    hacker:     "#60a5fa",
+    cyber:      "#f472b6",
+  };
+
   function drawBullet(ctx: CanvasRenderingContext2D, b: Bullet) {
     const cx = b.x + 3, cy = b.y + 6;
+    const charColor = CHAR_COLORS[b.charId] ?? "#e879f9";
+
+    // Convert hex to rgb components for rgba usage
+    const hexToRgb = (hex: string) => {
+      const r = parseInt(hex.slice(1,3),16);
+      const g = parseInt(hex.slice(3,5),16);
+      const bl = parseInt(hex.slice(5,7),16);
+      return { r, g, b: bl };
+    };
+    const { r, g, b: bl } = hexToRgb(charColor);
+
+    // Bullet trail — fading streak above the bullet
+    for (let t = 1; t <= 4; t++) {
+      const ty = cy + t * 6;
+      const alpha = (1 - t / 5) * 0.45;
+      ctx.fillStyle = `rgba(${r},${g},${bl},${alpha})`;
+      ctx.beginPath();
+      ctx.ellipse(cx, ty, 3 - t * 0.4, 4, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
 
     if (b.charId === "fire") {
       // Fireball — orange/red flame orb with trailing flicker
@@ -401,12 +430,10 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
       ctx.beginPath();
       ctx.ellipse(cx, cy, 11, 15, 0, 0, Math.PI * 2);
       ctx.fill();
-      // flame tip
       ctx.fillStyle = "rgba(255,220,80,0.9)";
       ctx.beginPath();
       ctx.ellipse(cx, cy - 8, 4, 7, 0, 0, Math.PI * 2);
       ctx.fill();
-      // glow
       ctx.shadowColor = "#ff6600";
       ctx.shadowBlur = 18;
       ctx.fillStyle = "rgba(255,100,0,0.3)";
@@ -425,7 +452,6 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
       grad.addColorStop(1, "#444");
       ctx.fillStyle = grad;
       ctx.beginPath();
-      // jagged polygon for rock shape
       ctx.moveTo(0, -12);
       ctx.lineTo(7, -7);
       ctx.lineTo(10, 0);
@@ -436,7 +462,6 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
       ctx.lineTo(-5, -9);
       ctx.closePath();
       ctx.fill();
-      // crack detail
       ctx.strokeStyle = "rgba(60,60,60,0.6)";
       ctx.lineWidth = 1;
       ctx.beginPath();
@@ -480,25 +505,25 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
       ctx.shadowBlur = 0;
 
     } else {
-      // Minara signal shot — pink/gold trading signal orb
+      // Per-character energy orb — colour matches the shooter's theme
       const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 11);
-      grad.addColorStop(0, "rgba(255,240,200,1)");
-      grad.addColorStop(0.35, "rgba(232,114,154,0.95)");
-      grad.addColorStop(0.75, "rgba(180,60,100,0.6)");
-      grad.addColorStop(1, "rgba(80,0,40,0)");
+      grad.addColorStop(0, "rgba(255,255,255,1)");
+      grad.addColorStop(0.3, `rgba(${r},${g},${bl},0.95)`);
+      grad.addColorStop(0.75, `rgba(${Math.floor(r*0.7)},${Math.floor(g*0.7)},${Math.floor(bl*0.7)},0.6)`);
+      grad.addColorStop(1, `rgba(${Math.floor(r*0.3)},${Math.floor(g*0.3)},${Math.floor(bl*0.3)},0)`);
       ctx.fillStyle = grad;
       ctx.beginPath();
       ctx.ellipse(cx, cy, 10, 15, 0, 0, Math.PI * 2);
       ctx.fill();
-      // bright core
-      ctx.fillStyle = "rgba(255,255,220,0.95)";
+      // bright white core
+      ctx.fillStyle = "rgba(255,255,255,0.95)";
       ctx.beginPath();
       ctx.ellipse(cx, cy - 2, 3, 4, 0, 0, Math.PI * 2);
       ctx.fill();
-      // glow
-      ctx.shadowColor = "#E8729A";
-      ctx.shadowBlur = 12;
-      ctx.fillStyle = "rgba(232,114,154,0.25)";
+      // coloured outer glow
+      ctx.shadowColor = charColor;
+      ctx.shadowBlur = 14;
+      ctx.fillStyle = `rgba(${r},${g},${bl},0.3)`;
       ctx.beginPath();
       ctx.ellipse(cx, cy, 13, 17, 0, 0, Math.PI * 2);
       ctx.fill();
@@ -852,7 +877,8 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
       for (let zi = s.zombies.length - 1; zi >= 0; zi--) {
         const b = s.bullets[bi]; const z = s.zombies[zi];
         if (b && z && b.x > z.x - 8 && b.x < z.x + z.w + 8 && b.y > z.y && b.y < z.y + z.h) {
-          spawnParticles(b.x, b.y);
+          const hitCol = CHAR_COLORS[b.charId] ?? "#e879f9";
+          spawnParticles(b.x, b.y, hitCol);
 
           s.zombies.splice(zi, 1);
           s.bullets.splice(bi, 1);
@@ -914,25 +940,33 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
       if (performance.now() - s.lastShot < 120) {
         const flashX = sh.x + sh.w * 0.5;   // centre — gun points straight up
         const flashY = sh.y - 4;             // just above the sprite top
-        const charId = CHARACTERS[selectedCharRef.current]?.id ?? "og";
-        const flashColors: Record<string, [string, string, string]> = {
-          og:    ["rgba(255,180,255,1)", "rgba(200,80,255,0.7)",  "rgba(120,0,200,0)"],
-          mvp:   ["rgba(180,220,255,1)", "rgba(40,140,255,0.8)",  "rgba(0,60,200,0)"],
-          stone: ["rgba(230,230,230,1)", "rgba(150,150,150,0.7)", "rgba(60,60,60,0)"],
-          fire:  ["rgba(255,255,160,1)", "rgba(255,120,0,0.8)",   "rgba(180,0,0,0)"],
-          squad: ["rgba(255,255,255,1)", "rgba(180,100,255,0.7)", "rgba(255,80,180,0)"],
-        };
-        const [c0, c1, c2] = flashColors[charId] ?? flashColors.og;
+        const charId = CHARACTERS[selectedCharRef.current]?.id ?? "bluekid";
+        // Muzzle flash colour always matches the character's bullet colour
+        const flashHex = CHAR_COLORS[charId] ?? "#e879f9";
+        const fr = parseInt(flashHex.slice(1,3),16);
+        const fg = parseInt(flashHex.slice(3,5),16);
+        const fb = parseInt(flashHex.slice(5,7),16);
         ctx.save();
-        ctx.globalAlpha = 0.9;
-        const flash = ctx.createRadialGradient(flashX, flashY, 0, flashX, flashY, 22);
-        flash.addColorStop(0, c0);
-        flash.addColorStop(0.5, c1);
-        flash.addColorStop(1, c2);
+        ctx.globalAlpha = 0.92;
+        const flash = ctx.createRadialGradient(flashX, flashY, 0, flashX, flashY, 26);
+        flash.addColorStop(0,   `rgba(255,255,255,1)`);
+        flash.addColorStop(0.3, `rgba(${fr},${fg},${fb},0.95)`);
+        flash.addColorStop(0.7, `rgba(${fr},${fg},${fb},0.5)`);
+        flash.addColorStop(1,   `rgba(${fr},${fg},${fb},0)`);
         ctx.fillStyle = flash;
+        // Spiky star shape for the flash
+        ctx.shadowColor = flashHex;
+        ctx.shadowBlur = 18;
         ctx.beginPath();
-        ctx.arc(flashX, flashY, 22, 0, Math.PI * 2);
+        ctx.arc(flashX, flashY, 26, 0, Math.PI * 2);
         ctx.fill();
+        // Inner hot white dot
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = "rgba(255,255,255,0.95)";
+        ctx.beginPath();
+        ctx.arc(flashX, flashY, 6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
         ctx.restore();
       }
     }
