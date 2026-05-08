@@ -346,31 +346,41 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
   async function startGame() {
     try { const { sessionToken } = await api.startSession(); sessionTokenRef.current = sessionToken; } catch { return; }
     const s = gs.current;
+    // Cancel any still-pending frame from a previous game before starting a new loop.
+    // Without this, a race between the tournament end-timer, React batching, and the
+    // rAF scheduler can leave the old loop alive alongside the new one — causing every
+    // moving object (zombies, bullets, particles) to update twice per paint → 2× speed.
+    cancelAnimationFrame(s.animId);
     s.shooter = { x: CW / 2 - 48, y: CH - 110, w: 96, h: 96, speed: 14 };
     s.bullets = []; s.zombies = []; s.particles = [];
+    s.pulses = []; s.signals = [];
     s.keys = { a: false, d: false, left: false, right: false };
-    s.pts = 0; s.hp = 100; s.dead = false; s.frame = 0; s.diffMult = 1; s.screenShake = 0; s.lastShot = 0; s.lastFrameTime = 0;
+    s.pts = 0; s.hp = 100; s.dead = false; s.frame = 0; s.diffMult = 1;
+    s.screenShake = 0; s.lastShot = 0; s.lastFrameTime = 0;
+    s.chartScroll = 0; s.scanY = 0; s.tickerX = 0;
     setScore(0); setHealth(100);
     setSubmitted(false); setSubmitError(""); setDevtoolsWarning(false);
     setTournamentEndedWhilePlaying(false);
     setPlayMode("tournament");
     setGameState("playing");
-    requestAnimationFrame(loop);
+    s.animId = requestAnimationFrame(loop);
   }
 
   function startDemoGame() {
     if (loggedIn) return;
     sessionTokenRef.current = null;
     const s = gs.current;
+    cancelAnimationFrame(s.animId); // kill any stale loop before starting a new one
     s.shooter = { x: CW / 2 - 48, y: CH - 110, w: 96, h: 96, speed: 14 };
-    s.bullets = []; s.zombies = []; s.particles = [];
+    s.bullets = []; s.zombies = []; s.particles = []; s.pulses = []; s.signals = [];
     s.keys = { a: false, d: false, left: false, right: false };
     s.pts = 0; s.hp = 100; s.dead = false; s.frame = 0; s.diffMult = 1; s.screenShake = 0; s.lastShot = 0; s.lastFrameTime = 0;
+    s.chartScroll = 0; s.scanY = 0; s.tickerX = 0; s.lastPulse = 0; s.lastSignal = 0;
     setScore(0); setHealth(100);
     setSubmitted(false); setSubmitError(""); setDevtoolsWarning(false);
     setPlayMode("demo");
     setGameState("playing");
-    requestAnimationFrame(loop);
+    s.animId = requestAnimationFrame(loop);
   }
 
   function spawnParticles(x: number, y: number, hitColor?: string) {
