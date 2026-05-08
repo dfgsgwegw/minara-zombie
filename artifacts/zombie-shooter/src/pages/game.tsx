@@ -17,10 +17,11 @@ const CW = 780;
 const CH = 560;
 
 const CHARACTERS = [
-  { id: "bluekid",    name: "Lowes",       src: "/assets/characters/player-blue-boy.png",      shooterSrc: "/assets/characters/player-blue-boy-shooter.png",      color: "#38bdf8", bg: "rgba(56,189,248,0.25)" },
-  { id: "glassygirl", name: "Antoniayly", src: "/assets/characters/player-glasses-girl.png",  shooterSrc: "/assets/characters/player-glasses-girl-shooter.png",  color: "#e879f9", bg: "rgba(232,121,249,0.25)" },
-  { id: "hacker",    name: "Hacker",      src: "/assets/characters/minara-hacker.png",         shooterSrc: "/assets/characters/minara-hacker-shooter.png",         color: "#60a5fa", bg: "rgba(96,165,250,0.25)" },
-  { id: "cyber",     name: "Cyber",       src: "/assets/characters/minara-cyber.png",          shooterSrc: "/assets/characters/minara-cyber-shooter.png",          color: "#f472b6", bg: "rgba(244,114,182,0.25)" },
+  { id: "og",    name: "OG Pod",    src: "/assets/shooter.png",                       shooterSrc: "/assets/shooter.png",                                  color: "#b060ff", bg: "rgba(140,60,255,0.25)" },
+  { id: "mvp",   name: "POD MVP",   src: "/assets/characters/pod-mvp.jpg",            shooterSrc: "/assets/characters/pod-mvp-shooter.png",               color: "#4499ff", bg: "rgba(40,120,255,0.25)" },
+  { id: "stone", name: "Stone Pod", src: "/assets/characters/stone-pod.jpg",          shooterSrc: "/assets/characters/stone-pod-shooter.png",             color: "#aaaaaa", bg: "rgba(150,150,150,0.25)" },
+  { id: "fire",  name: "Fire Pod",  src: "/assets/characters/fire-pod.jpg",           shooterSrc: "/assets/characters/fire-pod-shooter.png",              color: "#ff6600", bg: "rgba(255,80,0,0.25)" },
+  { id: "squad", name: "The Squad", src: "/assets/characters/squad-pod.jpg",          shooterSrc: "/assets/characters/squad-pod-shooter.png",             color: "#ff88cc", bg: "rgba(255,80,180,0.25)" },
 ];
 
 /* ── Audio ─────────────────────────────────────────────────────── */
@@ -115,43 +116,41 @@ function LiveLeaderboard({ entries, myUsername, tournament, tournamentStatus }: 
   const isEnded = tournamentStatus === "ended" || (tournament ? new Date(tournament.endTime) <= new Date() : false);
 
   return (
-    <div className="flex flex-col h-full overflow-hidden rounded-lg" style={{ background: "#F2EDE3", border: "1.5px solid #1C1A18" }}>
-      <div className="px-3 py-2 border-b flex-shrink-0" style={{ background: "#1C1A18", borderColor: "#1C1A18" }}>
-        <p className="font-black tracking-widest text-xs uppercase" style={{ color: "#EDE8DC" }}>🤖 Leaderboard</p>
+    <div className="flex flex-col h-full overflow-hidden rounded-lg border border-cyan-500/20" style={{ background: "rgba(0,20,30,0.88)" }}>
+      <div className="px-3 py-2 border-b border-cyan-500/20 flex-shrink-0" style={{ background: "rgba(0,60,80,0.5)" }}>
+        <p className="text-cyan-400 font-black tracking-widest text-xs uppercase">🌊 Leaderboard</p>
         {tournament && (
           isEnded
-            ? <p className="text-xs font-bold mt-0.5" style={{ color: "#E8729A" }}>🔴 ENDED · Final Scores</p>
-            : <p className="text-xs font-mono mt-0.5 truncate" style={{ color: "rgba(237,232,220,0.6)" }}>{timeLeft} left</p>
+            ? <p className="text-red-400 text-xs font-bold mt-0.5">🔴 ENDED · Final Scores</p>
+            : <p className="text-white/40 text-xs font-mono mt-0.5 truncate">{timeLeft} left</p>
         )}
       </div>
       <div className="flex-1 overflow-y-auto">
         {entries.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-xs text-center px-3 py-8" style={{ color: "#C8C3BA" }}>
-            <span className="text-2xl mb-2">🤖</span>No scores yet
+          <div className="flex flex-col items-center justify-center h-full text-white/20 text-xs text-center px-3 py-8">
+            <span className="text-2xl mb-2">🧟</span>No scores yet
           </div>
         ) : entries.map((e) => {
           const isMe = e.discordUsername === myUsername;
           return (
             <div key={e.discordUsername}
-              className={`flex items-center gap-2 px-3 py-2 border-b`}
-              style={{ borderColor: "#D4CFC4", background: isMe ? "rgba(232,114,154,0.1)" : "transparent" }}>
-              <span className={`text-sm w-6 text-center flex-shrink-0 font-black ${RANK_COLOR[e.rank] ?? ""}`}
-                style={!RANK_COLOR[e.rank] ? { color: "#C8C3BA" } : {}}>
+              className={`flex items-center gap-2 px-3 py-2 border-b border-white/5 ${isMe ? "bg-cyan-900/25" : ""}`}>
+              <span className={`text-sm w-6 text-center flex-shrink-0 font-black ${RANK_COLOR[e.rank] ?? "text-white/40"}`}>
                 {RANK_MEDAL[e.rank] ?? `#${e.rank}`}
               </span>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold truncate" style={{ color: isMe ? "#E8729A" : "#1C1A18" }}>
-                  {e.discordUsername}{isMe && <span className="ml-1" style={{ color: "#E8729A" }}>←</span>}
+                <p className={`text-xs font-bold truncate ${isMe ? "text-cyan-400" : "text-white/80"}`}>
+                  {e.discordUsername}{isMe && <span className="text-cyan-600 ml-1">←</span>}
                 </p>
-                <p className="text-[10px]" style={{ color: "#C8C3BA" }}>{e.gamesPlayed}× played</p>
+                <p className="text-white/30 text-[10px]">{e.gamesPlayed}× played</p>
               </div>
-              <span className="font-black text-sm flex-shrink-0" style={{ color: "#1C1A18" }}>{e.bestScore}</span>
+              <span className="text-yellow-400 font-black text-sm flex-shrink-0">{e.bestScore}</span>
             </div>
           );
         })}
       </div>
-      <div className="px-3 py-1.5 border-t flex-shrink-0" style={{ borderColor: "#D4CFC4" }}>
-        <p className="text-[10px] text-center" style={{ color: "#C8C3BA" }}>Refreshes every 10s</p>
+      <div className="px-3 py-1.5 border-t border-white/5 flex-shrink-0">
+        <p className="text-white/20 text-[10px] text-center">Refreshes every 10s</p>
       </div>
     </div>
   );
@@ -201,26 +200,18 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
     hp: 100,
     dead: false,
     animId: 0,
+    gen: 0,
     frame: 0,
     lastShot: 0,
     diffMult: 1,
     screenShake: 0,
     lastDir: 1 as 1 | -1,
     lastFrameTime: 0,
-    chartPoints: [] as number[],
-    chartScroll: 0,
-    scanY: 0,
-    pulses: [] as Array<{ x: number; y: number; r: number; maxR: number; alpha: number }>,
-    lastPulse: 0,
-    signals: [] as Array<{ x: number; y: number; vy: number; text: string; color: string; alpha: number }>,
-    lastSignal: 0,
-    tickerX: 0,
   });
 
   const shooterImg = useRef(new Image());
   const zombieImg = useRef(new Image());
   const bgImg = useRef(new Image());
-  const mascotImg = useRef(new Image());
 
   const fetchTournament = useCallback(async () => {
     try { const d = await api.currentTournament(); setTournamentStatus(d.status); setTournament(d.tournament); } catch {}
@@ -236,7 +227,6 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
     shooterImg.current = charImgs.current[0];
     zombieImg.current.src = "/assets/zombie.png";
     bgImg.current.src = "/assets/background.png";
-    mascotImg.current.src = "/assets/characters/player-glasses-girl.png";
 
     // Detect mobile/touch device
     const mq = window.matchMedia("(max-width: 639px)");
@@ -246,28 +236,13 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
 
     // init background bubbles
     const s = gs.current;
-    for (let i = 0; i < 22; i++) {
+    for (let i = 0; i < 18; i++) {
       s.bubbles.push({
         x: Math.random() * CW, y: Math.random() * CH,
-        r: 2 + Math.random() * 5, vy: 0.3 + Math.random() * 0.7,
-        alpha: 0.08 + Math.random() * 0.28,
+        r: 2 + Math.random() * 5, vy: 0.3 + Math.random() * 0.6,
+        alpha: 0.1 + Math.random() * 0.25,
       });
     }
-
-    // init chart with random price walk
-    s.chartPoints = [];
-    s.pulses = [];
-    s.signals = [];
-    let price = 45 + Math.random() * 20;
-    for (let i = 0; i < 220; i++) {
-      price += (Math.random() - 0.47) * 2.8;
-      price = Math.max(8, Math.min(92, price));
-      s.chartPoints.push(price);
-    }
-    s.chartScroll = 0;
-    s.scanY = 0;
-    s.lastPulse = 0;
-    s.lastSignal = 0;
 
     fetchTournament(); fetchLeaderboard();
     const lb = setInterval(fetchLeaderboard, 10_000);
@@ -346,6 +321,8 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
   async function startGame() {
     try { const { sessionToken } = await api.startSession(); sessionTokenRef.current = sessionToken; } catch { return; }
     const s = gs.current;
+    cancelAnimationFrame(s.animId);
+    s.gen++;
     s.shooter = { x: CW / 2 - 48, y: CH - 110, w: 96, h: 96, speed: 14 };
     s.bullets = []; s.zombies = []; s.particles = [];
     s.keys = { a: false, d: false, left: false, right: false };
@@ -355,13 +332,15 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
     setTournamentEndedWhilePlaying(false);
     setPlayMode("tournament");
     setGameState("playing");
-    requestAnimationFrame(loop);
+    s.animId = requestAnimationFrame(makeLoop(s.gen));
   }
 
   function startDemoGame() {
     if (loggedIn) return;
     sessionTokenRef.current = null;
     const s = gs.current;
+    cancelAnimationFrame(s.animId);
+    s.gen++;
     s.shooter = { x: CW / 2 - 48, y: CH - 110, w: 96, h: 96, speed: 14 };
     s.bullets = []; s.zombies = []; s.particles = [];
     s.keys = { a: false, d: false, left: false, right: false };
@@ -370,57 +349,27 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
     setSubmitted(false); setSubmitError(""); setDevtoolsWarning(false);
     setPlayMode("demo");
     setGameState("playing");
-    requestAnimationFrame(loop);
+    s.animId = requestAnimationFrame(makeLoop(s.gen));
   }
 
-  function spawnParticles(x: number, y: number, hitColor?: string) {
+  function spawnParticles(x: number, y: number) {
     const s = gs.current;
-    const base = hitColor ?? "#E8729A";
-    // Mix bullet colour with white sparks and gold
-    const colors = [base, base, "#ffffff", "#fbbf24", base, "#ffffff"];
-    for (let i = 0; i < 18; i++) {
-      const angle = (Math.PI * 2 * i) / 18 + Math.random() * 0.4;
-      const speed = 2.0 + Math.random() * 7;
+    const colors = ["#4ade80", "#22c55e", "#86efac", "#bbf7d0", "#a3e635"];
+    for (let i = 0; i < 12; i++) {
+      const angle = (Math.PI * 2 * i) / 12 + Math.random() * 0.5;
+      const speed = 2 + Math.random() * 4;
       s.particles.push({
         x, y,
         vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
         life: 1, maxLife: 1,
-        r: 2 + Math.random() * 5,
+        r: 3 + Math.random() * 4,
         color: colors[Math.floor(Math.random() * colors.length)],
       });
     }
   }
 
-  // Per-character bullet colours (match CHARACTERS color field)
-  const CHAR_COLORS: Record<string, string> = {
-    bluekid:    "#38bdf8",
-    glassygirl: "#e879f9",
-    hacker:     "#60a5fa",
-    cyber:      "#f472b6",
-  };
-
   function drawBullet(ctx: CanvasRenderingContext2D, b: Bullet) {
     const cx = b.x + 3, cy = b.y + 6;
-    const charColor = CHAR_COLORS[b.charId] ?? "#e879f9";
-
-    // Convert hex to rgb components for rgba usage
-    const hexToRgb = (hex: string) => {
-      const r = parseInt(hex.slice(1,3),16);
-      const g = parseInt(hex.slice(3,5),16);
-      const bl = parseInt(hex.slice(5,7),16);
-      return { r, g, b: bl };
-    };
-    const { r, g, b: bl } = hexToRgb(charColor);
-
-    // Bullet trail — fading streak above the bullet
-    for (let t = 1; t <= 4; t++) {
-      const ty = cy + t * 6;
-      const alpha = (1 - t / 5) * 0.45;
-      ctx.fillStyle = `rgba(${r},${g},${bl},${alpha})`;
-      ctx.beginPath();
-      ctx.ellipse(cx, ty, 3 - t * 0.4, 4, 0, 0, Math.PI * 2);
-      ctx.fill();
-    }
 
     if (b.charId === "fire") {
       // Fireball — orange/red flame orb with trailing flicker
@@ -433,10 +382,12 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
       ctx.beginPath();
       ctx.ellipse(cx, cy, 11, 15, 0, 0, Math.PI * 2);
       ctx.fill();
+      // flame tip
       ctx.fillStyle = "rgba(255,220,80,0.9)";
       ctx.beginPath();
       ctx.ellipse(cx, cy - 8, 4, 7, 0, 0, Math.PI * 2);
       ctx.fill();
+      // glow
       ctx.shadowColor = "#ff6600";
       ctx.shadowBlur = 18;
       ctx.fillStyle = "rgba(255,100,0,0.3)";
@@ -455,6 +406,7 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
       grad.addColorStop(1, "#444");
       ctx.fillStyle = grad;
       ctx.beginPath();
+      // jagged polygon for rock shape
       ctx.moveTo(0, -12);
       ctx.lineTo(7, -7);
       ctx.lineTo(10, 0);
@@ -465,6 +417,7 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
       ctx.lineTo(-5, -9);
       ctx.closePath();
       ctx.fill();
+      // crack detail
       ctx.strokeStyle = "rgba(60,60,60,0.6)";
       ctx.lineWidth = 1;
       ctx.beginPath();
@@ -508,81 +461,73 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
       ctx.shadowBlur = 0;
 
     } else {
-      // Per-character energy orb — colour matches the shooter's theme
-      const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 11);
-      grad.addColorStop(0, "rgba(255,255,255,1)");
-      grad.addColorStop(0.3, `rgba(${r},${g},${bl},0.95)`);
-      grad.addColorStop(0.75, `rgba(${Math.floor(r*0.7)},${Math.floor(g*0.7)},${Math.floor(bl*0.7)},0.6)`);
-      grad.addColorStop(1, `rgba(${Math.floor(r*0.3)},${Math.floor(g*0.3)},${Math.floor(bl*0.3)},0)`);
+      // OG Pod — original purple magic blast
+      const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 10);
+      grad.addColorStop(0, "rgba(255,180,255,1)");
+      grad.addColorStop(0.4, "rgba(200,80,255,0.8)");
+      grad.addColorStop(1, "rgba(100,0,200,0)");
       ctx.fillStyle = grad;
       ctx.beginPath();
-      ctx.ellipse(cx, cy, 10, 15, 0, 0, Math.PI * 2);
+      ctx.ellipse(cx, cy, 10, 14, 0, 0, Math.PI * 2);
       ctx.fill();
-      // bright white core
-      ctx.fillStyle = "rgba(255,255,255,0.95)";
+      ctx.fillStyle = "#fff";
       ctx.beginPath();
-      ctx.ellipse(cx, cy - 2, 3, 4, 0, 0, Math.PI * 2);
+      ctx.ellipse(cx, cy - 2, 3, 5, 0, 0, Math.PI * 2);
       ctx.fill();
-      // coloured outer glow
-      ctx.shadowColor = charColor;
-      ctx.shadowBlur = 14;
-      ctx.fillStyle = `rgba(${r},${g},${bl},0.3)`;
-      ctx.beginPath();
-      ctx.ellipse(cx, cy, 13, 17, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.shadowBlur = 0;
     }
   }
 
   function drawHud(ctx: CanvasRenderingContext2D, pts: number, hp: number) {
-    // Score box — dark card, gold text
-    ctx.fillStyle = "rgba(10,8,6,0.82)";
+    // Score box
+    ctx.fillStyle = "rgba(0,10,20,0.7)";
     ctx.beginPath();
-    ctx.roundRect(8, 8, 190, 66, 6);
+    ctx.roundRect(8, 8, 180, 62, 8);
     ctx.fill();
-    ctx.strokeStyle = "rgba(232,114,154,0.5)";
-    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = "rgba(0,200,255,0.3)";
+    ctx.lineWidth = 1;
     ctx.stroke();
 
-    ctx.font = "bold 11px 'Inter', sans-serif";
-    ctx.fillStyle = "rgba(200,195,186,0.9)";
-    ctx.fillText("PROFIT SCORE", 18, 26);
-    ctx.font = "bold 28px 'Georgia', serif";
-    ctx.fillStyle = "#E8729A";
-    ctx.fillText("$" + String(pts), 18, 56);
+    ctx.font = "bold 14px 'monospace'";
+    ctx.fillStyle = "rgba(0,200,255,0.9)";
+    ctx.fillText("SCORE", 18, 28);
+    ctx.font = "bold 22px 'monospace'";
+    ctx.fillStyle = "#fbbf24";
+    ctx.fillText(String(pts), 18, 52);
 
-    // Health bar — dark card, colored bar
-    ctx.fillStyle = "rgba(10,8,6,0.82)";
+    // Health bar
+    ctx.fillStyle = "rgba(0,10,20,0.7)";
     ctx.beginPath();
-    ctx.roundRect(CW - 194, 8, 186, 66, 6);
+    ctx.roundRect(CW - 188, 8, 180, 62, 8);
     ctx.fill();
-    ctx.strokeStyle = "rgba(232,114,154,0.5)";
-    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = "rgba(0,200,255,0.3)";
+    ctx.lineWidth = 1;
     ctx.stroke();
-    ctx.font = "bold 11px 'Inter', sans-serif";
-    ctx.fillStyle = "rgba(200,195,186,0.9)";
-    ctx.fillText("PORTFOLIO HEALTH", CW - 184, 26);
-    const barW = 162;
+    ctx.font = "bold 12px monospace";
+    ctx.fillStyle = "rgba(0,200,255,0.9)";
+    ctx.fillText("HEALTH", CW - 178, 26);
+    const barW = 154;
     const barFill = (hp / 100) * barW;
-    ctx.fillStyle = "rgba(255,255,255,0.06)";
-    ctx.beginPath(); ctx.roundRect(CW - 184, 36, barW, 16, 4); ctx.fill();
-    const hc = hp > 60 ? "#22c55e" : hp > 30 ? "#facc15" : "#ef4444";
+    ctx.fillStyle = "rgba(255,255,255,0.08)";
+    ctx.beginPath(); ctx.roundRect(CW - 178, 34, barW, 16, 4); ctx.fill();
+    const hc = hp > 60 ? "#4ade80" : hp > 30 ? "#facc15" : "#ef4444";
     ctx.fillStyle = hc;
-    if (barFill > 0) { ctx.beginPath(); ctx.roundRect(CW - 184, 36, barFill, 16, 4); ctx.fill(); }
+    if (barFill > 0) { ctx.beginPath(); ctx.roundRect(CW - 178, 34, barFill, 16, 4); ctx.fill(); }
     ctx.font = "bold 11px monospace";
     ctx.fillStyle = "white";
-    ctx.fillText(`${hp}%`, CW - 184 + barW / 2 - 14, 49);
+    ctx.fillText(`${hp}%`, CW - 178 + barW / 2 - 14, 47);
   }
 
-  function loop(now: number) {
+  function makeLoop(gen: number) {
+    function loop(now: number) {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d")!;
     const s = gs.current;
+    if (s.gen !== gen) return;
     if (s.dead) { setGameState("over"); setScore(s.pts); return; }
 
-    // Delta time: scale all movement by elapsed time so speed is frame-rate independent
-    const dt = s.lastFrameTime === 0 ? 1 : Math.min((now - s.lastFrameTime) / 16.667, 3);
+    // Delta time: cap at 1.5 so API polling in tournament mode can't cause speed bursts
+    const dt = s.lastFrameTime === 0 ? 1 : Math.min((now - s.lastFrameTime) / 16.667, 1.5);
     s.lastFrameTime = now;
 
     s.frame++;
@@ -611,303 +556,21 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
     ctx.translate(shakeX, shakeY);
 
     // Background
-    if (bgImg.current.complete && bgImg.current.naturalWidth > 0) {
-      ctx.drawImage(bgImg.current, 0, 0, CW, CH);
-    } else {
-      const grad = ctx.createLinearGradient(0, 0, 0, CH);
-      grad.addColorStop(0, "#05080F");
-      grad.addColorStop(0.5, "#0A0E18");
-      grad.addColorStop(1, "#060A12");
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, CW, CH);
-    }
+    ctx.drawImage(bgImg.current, 0, 0, CW, CH);
 
-    // ── Grid overlay ─────────────────────────────────────────────
-    ctx.save();
-    ctx.globalAlpha = 0.06;
-    ctx.strokeStyle = "#22c55e";
-    ctx.lineWidth = 1;
-    for (let gx = 0; gx <= CW; gx += 78) {
-      ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, CH); ctx.stroke();
-    }
-    for (let gy = 0; gy <= CH; gy += 65) {
-      ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(CW, gy); ctx.stroke();
-    }
-    ctx.restore();
-
-    // ── Scrolling line chart ─────────────────────────────────────
-    {
-      const cps = s.chartPoints;
-      s.chartScroll += 0.55 * dt;
-
-      // Add a new price point every 7 frames
-      if (s.frame % 7 === 0) {
-        const last = cps[cps.length - 1] ?? 50;
-        const next = last + (Math.random() - 0.47) * 2.8 * s.diffMult;
-        cps.push(Math.max(6, Math.min(94, next)));
-        if (cps.length > 320) cps.shift();
-      }
-
-      const stride = 10;
-      const visibleCount = Math.ceil(CW / stride) + 4;
-      const slice = cps.slice(Math.max(0, cps.length - visibleCount));
-      const chartTop = CH * 0.52;
-      const chartH = CH * 0.42;
-      const scrollOff = s.chartScroll % stride;
-
-      if (slice.length > 1) {
-        const minP = Math.min(...slice) - 4;
-        const maxP = Math.max(...slice) + 4;
-        const scaleP = (p: number) => chartTop + chartH - ((p - minP) / (maxP - minP)) * chartH;
-
-        // Area fill
-        ctx.save();
-        ctx.beginPath();
-        slice.forEach((p, i) => {
-          const x = i * stride - scrollOff;
-          const y = scaleP(p);
-          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-        });
-        const lastX = (slice.length - 1) * stride - scrollOff;
-        ctx.lineTo(lastX, chartTop + chartH);
-        ctx.lineTo(-scrollOff, chartTop + chartH);
-        ctx.closePath();
-        const areaGrad = ctx.createLinearGradient(0, chartTop, 0, chartTop + chartH);
-        areaGrad.addColorStop(0, "rgba(34,197,94,0.28)");
-        areaGrad.addColorStop(1, "rgba(34,197,94,0.0)");
-        ctx.fillStyle = areaGrad;
-        ctx.globalAlpha = 0.9;
-        ctx.fill();
-
-        // Line
-        ctx.beginPath();
-        slice.forEach((p, i) => {
-          const x = i * stride - scrollOff;
-          const y = scaleP(p);
-          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-        });
-        ctx.strokeStyle = "#22c55e";
-        ctx.lineWidth = 2;
-        ctx.globalAlpha = 0.7;
-        ctx.shadowColor = "#22c55e";
-        ctx.shadowBlur = 8;
-        ctx.stroke();
-        ctx.shadowBlur = 0;
-
-        // Candle-style bar markers every 5 points
-        ctx.globalAlpha = 0.55;
-        for (let i = 4; i < slice.length; i += 5) {
-          const x = i * stride - scrollOff + stride / 2;
-          const open = scaleP(slice[i - 4]);
-          const close = scaleP(slice[i]);
-          const high = scaleP(Math.max(...slice.slice(i - 4, i + 1)));
-          const low = scaleP(Math.min(...slice.slice(i - 4, i + 1)));
-          const isUp = slice[i] >= slice[i - 4];
-          const candleColor = isUp ? "#22c55e" : "#ef4444";
-          ctx.strokeStyle = candleColor;
-          ctx.lineWidth = 1;
-          ctx.beginPath(); ctx.moveTo(x, high); ctx.lineTo(x, low); ctx.stroke();
-          ctx.fillStyle = candleColor;
-          const bodyTop = Math.min(open, close);
-          const bodyH = Math.max(2, Math.abs(close - open));
-          ctx.fillRect(x - 3, bodyTop, 6, bodyH);
-        }
-        ctx.restore();
-      }
-    }
-
-    // ── Expanding pulse rings ─────────────────────────────────────
-    {
-      const now2 = performance.now();
-      if (now2 - s.lastPulse > 900) {
-        s.lastPulse = now2;
-        s.pulses.push({
-          x: 80 + Math.random() * (CW - 160),
-          y: CH * 0.25 + Math.random() * CH * 0.5,
-          r: 0, maxR: 55 + Math.random() * 90, alpha: 0.55,
-        });
-      }
-      for (let i = s.pulses.length - 1; i >= 0; i--) {
-        const p = s.pulses[i];
-        p.r += 1.6 * dt;
-        p.alpha -= 0.007 * dt;
-        if (p.alpha <= 0 || p.r >= p.maxR) { s.pulses.splice(i, 1); continue; }
-        ctx.save();
-        ctx.globalAlpha = p.alpha * 0.35;
-        ctx.strokeStyle = "#E8729A";
-        ctx.lineWidth = 1.5;
-        ctx.shadowColor = "#E8729A";
-        ctx.shadowBlur = 6;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.stroke();
-        ctx.globalAlpha = p.alpha * 0.12;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r * 0.55, 0, Math.PI * 2);
-        ctx.stroke();
-        ctx.restore();
-      }
-    }
-
-    // ── CRT scan line ─────────────────────────────────────────────
-    {
-      s.scanY += 1.4 * dt;
-      if (s.scanY > CH + 30) s.scanY = -30;
-      const sg = ctx.createLinearGradient(0, s.scanY - 18, 0, s.scanY + 18);
-      sg.addColorStop(0, "rgba(34,197,94,0)");
-      sg.addColorStop(0.5, "rgba(34,197,94,0.10)");
-      sg.addColorStop(1, "rgba(34,197,94,0)");
-      ctx.fillStyle = sg;
-      ctx.fillRect(0, s.scanY - 18, CW, 36);
-    }
-
-    // ── Floating signals ──────────────────────────────────────────
-    {
-      const signalTexts = ["BUY", "SELL", "RSI 72", "MACD ↑", "BULL RUN", "BEAR TRAP", "+2.4%", "-1.8%", "ATH!", "DIP?", "HODL", "ENTRY", "MINARA ✓", "AI SIGNAL", "WALL ST.", "PORTFOLIO ▲", "AGENT ON", "DEFEND!"];
-      const signalColors = ["#22c55e","#ef4444","#fbbf24","#60a5fa","#22c55e","#ef4444","#22c55e","#ef4444","#22c55e","#ef4444","#a78bfa","#E8729A","#E8729A","#E8729A","#EDE8DC","#22c55e","#E8729A","#fbbf24"];
-      const now3 = performance.now();
-      if (now3 - s.lastSignal > 1600) {
-        s.lastSignal = now3;
-        const idx = Math.floor(Math.random() * signalTexts.length);
-        s.signals.push({
-          x: 30 + Math.random() * (CW - 100),
-          y: CH * 0.85,
-          vy: 0.5 + Math.random() * 0.7,
-          text: signalTexts[idx],
-          color: signalColors[idx],
-          alpha: 0.55 + Math.random() * 0.25,
-        });
-      }
-      for (let i = s.signals.length - 1; i >= 0; i--) {
-        const sig = s.signals[i];
-        sig.y -= sig.vy * dt;
-        sig.alpha -= 0.003 * dt;
-        if (sig.alpha <= 0 || sig.y < -20) { s.signals.splice(i, 1); continue; }
-        ctx.save();
-        ctx.globalAlpha = sig.alpha;
-        ctx.font = "bold 11px monospace";
-        ctx.fillStyle = sig.color;
-        ctx.shadowColor = sig.color;
-        ctx.shadowBlur = 8;
-        ctx.fillText(sig.text, sig.x, sig.y);
-        ctx.restore();
-      }
-    }
-
-    // ── Dark vignette overlay ─────────────────────────────────────
-    const vignette = ctx.createRadialGradient(CW/2, CH/2, CH*0.22, CW/2, CH/2, CH*0.88);
-    vignette.addColorStop(0, "rgba(0,0,0,0)");
-    vignette.addColorStop(1, "rgba(0,0,0,0.62)");
-    ctx.fillStyle = vignette;
+    // Underwater overlay tint
+    ctx.fillStyle = "rgba(0,30,60,0.18)";
     ctx.fillRect(0, 0, CW, CH);
 
-    // ── Floating ticker numbers ───────────────────────────────────
+    // Bubbles
     for (const b of s.bubbles) {
       b.y -= b.vy * dt;
-      if (b.y < -20) { b.y = CH + 20; b.x = Math.random() * CW; b.alpha = 0.08 + Math.random() * 0.28; }
-      const isGreen = b.alpha > 0.15;
-      ctx.font = `bold ${Math.round(b.r * 1.3)}px monospace`;
-      ctx.fillStyle = isGreen
-        ? `rgba(34,197,94,${b.alpha * 0.85})`
-        : `rgba(239,68,68,${b.alpha * 0.85})`;
-      ctx.fillText(isGreen ? `+${(b.r * 0.8).toFixed(2)}%` : `-${(b.r * 0.5).toFixed(2)}%`, b.x, b.y);
-    }
-
-    // ── Minara ghost mascot watermark ────────────────────────────
-    if (mascotImg.current.complete && mascotImg.current.naturalWidth > 0) {
-      ctx.save();
-      ctx.globalAlpha = 0.06;
-      const mw = 260, mh = 320;
-      ctx.drawImage(mascotImg.current, CW - mw - 4, CH - mh - 2, mw, mh);
-      ctx.restore();
-    }
-
-    // ── Minara corner logo stamp ──────────────────────────────────
-    {
-      ctx.save();
-      ctx.globalAlpha = 0.55;
-      // pill background
-      ctx.fillStyle = "rgba(28,26,24,0.72)";
-      ctx.beginPath();
-      ctx.roundRect(10, CH - 36, 136, 28, 5);
-      ctx.fill();
-      ctx.strokeStyle = "rgba(232,114,154,0.5)";
+      if (b.y < -10) b.y = CH + 10;
+      ctx.strokeStyle = `rgba(100,220,255,${b.alpha})`;
       ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
       ctx.stroke();
-      // ● dot
-      ctx.globalAlpha = 0.85;
-      ctx.fillStyle = "#E8729A";
-      ctx.beginPath();
-      ctx.arc(24, CH - 22, 5, 0, Math.PI * 2);
-      ctx.fill();
-      // MINARA text
-      ctx.font = "bold 13px 'Georgia', serif";
-      ctx.fillStyle = "#EDE8DC";
-      ctx.fillText("MINARA", 34, CH - 17);
-      // AI DEFENDER sub
-      ctx.font = "bold 8px monospace";
-      ctx.fillStyle = "#E8729A";
-      ctx.fillText("AI DEFENDER", 34, CH - 8);
-      ctx.restore();
-    }
-
-    // ── Scrolling ticker tape ─────────────────────────────────────
-    {
-      const tickerItems = [
-        "MINARA ▲4.2%", "RUN YOUR OWN WALL STREET", "BTC $94,200 ▲1.1%",
-        "SOL $182 ▲2.4%", "ETH $3,400", "PORTFOLIO DEFENSE MODE",
-        "AI SIGNAL ACTIVE", "MINARA AGENT ONLINE", "BUY THE DIP",
-        "WALL STREET UNLOCKED", "PROFIT SECURED ✓", "MINARA.AI",
-      ];
-      const tickerStr = tickerItems.map(t => `  ◆ ${t}  `).join("");
-      ctx.font = "bold 10px monospace";
-      const fullW = ctx.measureText(tickerStr).width;
-      s.tickerX -= 0.9 * dt;
-      if (s.tickerX < -fullW) s.tickerX = 0;
-
-      // tape background
-      ctx.save();
-      ctx.globalAlpha = 0.82;
-      ctx.fillStyle = "rgba(28,26,24,0.88)";
-      ctx.fillRect(0, CH - 18, CW, 18);
-      ctx.strokeStyle = "rgba(232,114,154,0.4)";
-      ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.moveTo(0, CH - 18); ctx.lineTo(CW, CH - 18); ctx.stroke();
-
-      // scrolling text — draw twice to loop seamlessly
-      ctx.globalAlpha = 0.95;
-      ctx.fillStyle = "#EDE8DC";
-      ctx.shadowColor = "#E8729A";
-      ctx.shadowBlur = 3;
-      ctx.fillText(tickerStr, s.tickerX, CH - 5);
-      ctx.fillText(tickerStr, s.tickerX + fullW, CH - 5);
-      // highlight ◆ separators in pink
-      ctx.restore();
-    }
-
-    // ── AI AGENT ACTIVE pulse badge ───────────────────────────────
-    {
-      const pulse = Math.sin(performance.now() / 400) * 0.3 + 0.7;
-      ctx.save();
-      ctx.globalAlpha = pulse * 0.9;
-      ctx.fillStyle = "rgba(28,26,24,0.78)";
-      ctx.beginPath();
-      ctx.roundRect(CW / 2 - 72, 8, 144, 24, 5);
-      ctx.fill();
-      ctx.strokeStyle = "rgba(232,114,154,0.6)";
-      ctx.lineWidth = 1;
-      ctx.stroke();
-      // blinking dot
-      ctx.fillStyle = pulse > 0.75 ? "#E8729A" : "#fbbf24";
-      ctx.beginPath();
-      ctx.arc(CW / 2 - 56, 20, 4, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.font = "bold 10px monospace";
-      ctx.fillStyle = "#EDE8DC";
-      ctx.textAlign = "center";
-      ctx.fillText("MINARA AI AGENT ACTIVE", CW / 2 + 8, 24);
-      ctx.textAlign = "left";
-      ctx.restore();
     }
 
     // Shooter movement (arrow keys OR A/D)
@@ -945,10 +608,10 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
       ctx.translate(cx, cy);
       ctx.rotate(tilt);
 
-      // red market-crash aura
+      // green glow aura
       const aura = ctx.createRadialGradient(0, 0, sw * 0.2, 0, 0, sw * 0.72);
-      aura.addColorStop(0, "rgba(255,40,40,0.22)");
-      aura.addColorStop(1, "rgba(180,0,0,0)");
+      aura.addColorStop(0, "rgba(60,255,80,0.18)");
+      aura.addColorStop(1, "rgba(0,180,0,0)");
       ctx.fillStyle = aura;
       ctx.beginPath();
       ctx.ellipse(0, 0, sw * 0.72, sh * 0.72, 0, 0, Math.PI * 2);
@@ -977,8 +640,7 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
       for (let zi = s.zombies.length - 1; zi >= 0; zi--) {
         const b = s.bullets[bi]; const z = s.zombies[zi];
         if (b && z && b.x > z.x - 8 && b.x < z.x + z.w + 8 && b.y > z.y && b.y < z.y + z.h) {
-          const hitCol = CHAR_COLORS[b.charId] ?? "#e879f9";
-          spawnParticles(b.x, b.y, hitCol);
+          spawnParticles(b.x, b.y);
 
           s.zombies.splice(zi, 1);
           s.bullets.splice(bi, 1);
@@ -1040,33 +702,25 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
       if (performance.now() - s.lastShot < 120) {
         const flashX = sh.x + sh.w * 0.5;   // centre — gun points straight up
         const flashY = sh.y - 4;             // just above the sprite top
-        const charId = CHARACTERS[selectedCharRef.current]?.id ?? "bluekid";
-        // Muzzle flash colour always matches the character's bullet colour
-        const flashHex = CHAR_COLORS[charId] ?? "#e879f9";
-        const fr = parseInt(flashHex.slice(1,3),16);
-        const fg = parseInt(flashHex.slice(3,5),16);
-        const fb = parseInt(flashHex.slice(5,7),16);
+        const charId = CHARACTERS[selectedCharRef.current]?.id ?? "og";
+        const flashColors: Record<string, [string, string, string]> = {
+          og:    ["rgba(255,180,255,1)", "rgba(200,80,255,0.7)",  "rgba(120,0,200,0)"],
+          mvp:   ["rgba(180,220,255,1)", "rgba(40,140,255,0.8)",  "rgba(0,60,200,0)"],
+          stone: ["rgba(230,230,230,1)", "rgba(150,150,150,0.7)", "rgba(60,60,60,0)"],
+          fire:  ["rgba(255,255,160,1)", "rgba(255,120,0,0.8)",   "rgba(180,0,0,0)"],
+          squad: ["rgba(255,255,255,1)", "rgba(180,100,255,0.7)", "rgba(255,80,180,0)"],
+        };
+        const [c0, c1, c2] = flashColors[charId] ?? flashColors.og;
         ctx.save();
-        ctx.globalAlpha = 0.92;
-        const flash = ctx.createRadialGradient(flashX, flashY, 0, flashX, flashY, 26);
-        flash.addColorStop(0,   `rgba(255,255,255,1)`);
-        flash.addColorStop(0.3, `rgba(${fr},${fg},${fb},0.95)`);
-        flash.addColorStop(0.7, `rgba(${fr},${fg},${fb},0.5)`);
-        flash.addColorStop(1,   `rgba(${fr},${fg},${fb},0)`);
+        ctx.globalAlpha = 0.9;
+        const flash = ctx.createRadialGradient(flashX, flashY, 0, flashX, flashY, 22);
+        flash.addColorStop(0, c0);
+        flash.addColorStop(0.5, c1);
+        flash.addColorStop(1, c2);
         ctx.fillStyle = flash;
-        // Spiky star shape for the flash
-        ctx.shadowColor = flashHex;
-        ctx.shadowBlur = 18;
         ctx.beginPath();
-        ctx.arc(flashX, flashY, 26, 0, Math.PI * 2);
+        ctx.arc(flashX, flashY, 22, 0, Math.PI * 2);
         ctx.fill();
-        // Inner hot white dot
-        ctx.globalAlpha = 1;
-        ctx.fillStyle = "rgba(255,255,255,0.95)";
-        ctx.beginPath();
-        ctx.arc(flashX, flashY, 6, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.shadowBlur = 0;
         ctx.restore();
       }
     }
@@ -1074,36 +728,23 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
     // HUD
     drawHud(ctx, s.pts, s.hp);
 
-    // Difficulty indicator — centered top
+    // Difficulty indicator
     if (s.diffMult > 1) {
-      const lvl = Math.floor(s.diffMult / 0.25) - 2;
-      ctx.fillStyle = "rgba(10,8,6,0.75)";
-      ctx.beginPath();
-      ctx.roundRect(CW / 2 - 60, 8, 120, 28, 6);
-      ctx.fill();
-      ctx.strokeStyle = "rgba(239,68,68,0.6)";
-      ctx.lineWidth = 1;
-      ctx.stroke();
-      ctx.font = "bold 12px monospace";
-      ctx.fillStyle = "#ef4444";
-      ctx.textAlign = "center";
-      ctx.fillText(`🔴 BEAR MARKET LVL ${lvl}`, CW / 2, 27);
-      ctx.textAlign = "left";
+      ctx.font = "bold 11px monospace";
+      ctx.fillStyle = `rgba(255,${Math.max(0,220-s.diffMult*40)},50,0.8)`;
+      ctx.fillText(`⚡ LEVEL ${Math.floor(s.diffMult / 0.25) - 2}`, CW / 2 - 28, 22);
     }
 
     // Demo mode badge
     if (playMode === "demo") {
-      ctx.fillStyle = "rgba(10,8,6,0.7)";
+      ctx.fillStyle = "rgba(0,10,20,0.65)";
       ctx.beginPath();
-      ctx.roundRect(CW / 2 - 52, CH - 30, 104, 22, 5);
+      ctx.roundRect(CW / 2 - 44, CH - 28, 88, 20, 5);
       ctx.fill();
-      ctx.strokeStyle = "rgba(232,114,154,0.4)";
-      ctx.lineWidth = 1;
-      ctx.stroke();
       ctx.font = "bold 11px monospace";
-      ctx.fillStyle = "rgba(232,114,154,0.8)";
+      ctx.fillStyle = "rgba(0,200,255,0.55)";
       ctx.textAlign = "center";
-      ctx.fillText("📊 DEMO TRADING", CW / 2, CH - 15);
+      ctx.fillText("🎮 DEMO MODE", CW / 2, CH - 14);
       ctx.textAlign = "left";
     }
 
@@ -1111,6 +752,8 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
 
     if (s.hp <= 0) { s.dead = true; setScore(s.pts); setGameState("over"); return; }
     s.animId = requestAnimationFrame(loop);
+    }
+    return loop;
   }
 
   useEffect(() => {
@@ -1200,47 +843,44 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
   const renderSidebar = () => (
     <>
       {!loggedIn ? (
-        <div className="flex flex-col h-full overflow-hidden rounded-lg" style={{ background: "#F2EDE3", border: "1.5px solid #1C1A18" }}>
-          <div className="px-3 py-2 border-b flex-shrink-0 flex items-center justify-between" style={{ background: "#1C1A18", borderColor: "#1C1A18" }}>
-            <p className="font-black tracking-widest text-xs uppercase" style={{ color: "#EDE8DC" }}>🔐 Login to Play</p>
-            {isMobile && <button onClick={() => setShowSidebar(false)} style={{ color: "#EDE8DC" }} className="text-lg leading-none">×</button>}
+        <div className="flex flex-col h-full overflow-hidden rounded-lg border border-cyan-500/30" style={{ background: "rgba(0,20,30,0.92)" }}>
+          <div className="px-3 py-2 border-b border-cyan-500/20 flex-shrink-0 flex items-center justify-between" style={{ background: "rgba(0,60,80,0.5)" }}>
+            <p className="text-cyan-400 font-black tracking-widest text-xs uppercase">🔐 Login to Play</p>
+            {isMobile && <button onClick={() => setShowSidebar(false)} className="text-white/40 text-lg leading-none">×</button>}
           </div>
           <form onSubmit={handleSidebarLogin} className="p-3 space-y-2.5 flex-shrink-0">
             <div>
-              <label className="block text-[10px] font-bold mb-1 tracking-widest uppercase" style={{ color: "#1C1A18" }}>Discord Username</label>
+              <label className="block text-cyan-400/70 text-[10px] font-bold mb-1 tracking-widest uppercase">Discord Username</label>
               <input type="text" value={loginUsername} onChange={e => setLoginUsername(e.target.value)}
                 placeholder="Username" required autoComplete="username"
-                className="w-full rounded px-2 py-1.5 text-xs focus:outline-none transition placeholder-stone-400"
-                style={{ border: "1.5px solid #1C1A18", background: "#FFFFFF", color: "#1C1A18" }} />
+                className="w-full bg-black/60 border border-cyan-500/30 text-white placeholder-white/20 rounded px-2 py-1.5 text-xs focus:outline-none focus:border-cyan-400 transition" />
             </div>
             <div>
-              <label className="block text-[10px] font-bold mb-1 tracking-widest uppercase" style={{ color: "#1C1A18" }}>Password</label>
+              <label className="block text-cyan-400/70 text-[10px] font-bold mb-1 tracking-widest uppercase">Password</label>
               <input type="password" value={loginPassword} onChange={e => setLoginPassword(e.target.value)}
                 placeholder="••••••••" required autoComplete="current-password"
-                className="w-full rounded px-2 py-1.5 text-xs focus:outline-none transition placeholder-stone-400"
-                style={{ border: "1.5px solid #1C1A18", background: "#FFFFFF", color: "#1C1A18" }} />
+                className="w-full bg-black/60 border border-cyan-500/30 text-white placeholder-white/20 rounded px-2 py-1.5 text-xs focus:outline-none focus:border-cyan-400 transition" />
             </div>
-            {loginError && <p className="text-red-600 text-[10px] bg-red-50 border border-red-300 rounded p-1.5">{loginError}</p>}
+            {loginError && <p className="text-red-400 text-[10px] bg-red-900/20 border border-red-500/20 rounded p-1.5">{loginError}</p>}
             <button type="submit" disabled={loginLoading}
-              className="w-full font-black py-2 rounded text-xs tracking-widest uppercase transition disabled:opacity-50"
-              style={{ background: "#1C1A18", color: "#EDE8DC" }}>
+              className="w-full text-black font-black py-2 rounded text-xs tracking-widest uppercase transition disabled:opacity-50"
+              style={{ background: "linear-gradient(135deg, #00d4ff, #0080ff)" }}>
               {loginLoading ? "Logging in..." : "Login"}
             </button>
           </form>
-          <div className="flex-1 overflow-y-auto border-t" style={{ borderColor: "#D4CFC4" }}>
-            <div className="px-3 py-1.5 border-b" style={{ background: "#E8E2D6", borderColor: "#D4CFC4" }}>
-              <p className="text-[10px] font-black tracking-widest uppercase" style={{ color: "#1C1A18" }}>🤖 Leaderboard</p>
+          <div className="flex-1 overflow-y-auto border-t border-cyan-500/15">
+            <div className="px-3 py-1.5 border-b border-cyan-500/15" style={{ background: "rgba(0,40,60,0.4)" }}>
+              <p className="text-cyan-400/60 text-[10px] font-black tracking-widest uppercase">🌊 Leaderboard</p>
             </div>
             {leaderboard.length === 0 ? (
-              <div className="text-[10px] text-center py-4" style={{ color: "#C8C3BA" }}>🤖 No scores yet</div>
+              <div className="text-white/20 text-[10px] text-center py-4">🧟 No scores yet</div>
             ) : leaderboard.map(e => (
-              <div key={e.discordUsername} className="flex items-center gap-1.5 px-3 py-1.5 border-b" style={{ borderColor: "#D4CFC4" }}>
-                <span className={`text-[10px] w-5 text-center flex-shrink-0 font-black ${RANK_COLOR[e.rank] ?? ""}`}
-                  style={!RANK_COLOR[e.rank] ? { color: "#C8C3BA" } : {}}>
+              <div key={e.discordUsername} className="flex items-center gap-1.5 px-3 py-1.5 border-b border-white/5">
+                <span className={`text-[10px] w-5 text-center flex-shrink-0 font-black ${RANK_COLOR[e.rank] ?? "text-white/40"}`}>
                   {RANK_MEDAL[e.rank] ?? `#${e.rank}`}
                 </span>
-                <p className="flex-1 min-w-0 text-[10px] truncate" style={{ color: "#1C1A18" }}>{e.discordUsername}</p>
-                <span className="font-black text-[10px] flex-shrink-0" style={{ color: "#1C1A18" }}>{e.bestScore}</span>
+                <p className="flex-1 min-w-0 text-[10px] text-white/60 truncate">{e.discordUsername}</p>
+                <span className="text-yellow-400 font-black text-[10px] flex-shrink-0">{e.bestScore}</span>
               </div>
             ))}
           </div>
@@ -1249,7 +889,7 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
         <div className="h-full">
           {isMobile && (
             <div className="flex justify-end mb-1">
-              <button onClick={() => setShowSidebar(false)} style={{ color: "#1C1A18" }} className="text-lg leading-none px-2">×</button>
+              <button onClick={() => setShowSidebar(false)} className="text-white/40 text-lg leading-none px-2">×</button>
             </div>
           )}
           <LiveLeaderboard entries={leaderboard} myUsername={user?.discordUsername ?? ""} tournament={tournament} tournamentStatus={tournamentStatus} />
@@ -1259,28 +899,29 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
   );
 
   return (
-    <div className="flex flex-col overflow-hidden" style={{ height: "100dvh", userSelect: "none", background: "#EDE8DC", color: "#1C1A18" }}>
+    <div className="flex flex-col bg-black text-white overflow-hidden" style={{ height: "100dvh", userSelect: "none" }}>
 
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-2.5 border-b flex-shrink-0 gap-2"
-        style={{ borderColor: "#C8C3BA", background: "#EDE8DC" }}>
-        <span className="font-bold text-xs truncate min-w-0" style={{ color: "#1C1A18" }}>
-          {loggedIn ? user?.discordUsername : <span style={{ color: "#C8C3BA" }} className="italic">Not logged in</span>}
+      <div className="flex items-center justify-between px-3 py-2 border-b flex-shrink-0 gap-2"
+        style={{ borderColor: "rgba(0,200,255,0.12)", background: "rgba(0,10,20,0.95)" }}>
+        <span className="text-cyan-400 font-bold text-xs truncate min-w-0">
+          {loggedIn ? user?.discordUsername : <span className="text-white/30 italic">Not logged in</span>}
         </span>
+        <h1 className="font-black tracking-widest text-xs sm:text-sm flex-shrink-0"
+          style={{ color: "#00d4ff", textShadow: "0 0 12px rgba(0,212,255,0.6)" }}>
+          🌊 PACIFIC ZOMBIE FIGHTER
+        </h1>
         <div className="flex items-center gap-2 flex-shrink-0">
-          <span className="font-black tracking-wider text-xs sm:text-sm" style={{ fontFamily: "'Playfair Display', serif", color: "#1C1A18" }}>MINARA</span>
-          <span className="text-xs font-bold tracking-widest" style={{ color: "#C8C3BA" }}>AI DEFENDER</span>
-        </div>
-        <div className="flex items-center gap-2 flex-shrink-0">
+          {/* Mobile sidebar toggle */}
           {isMobile && (
             <button onClick={() => setShowSidebar(v => !v)}
-              className="text-xs px-2 py-0.5 rounded font-bold" style={{ color: "#1C1A18", border: "1.5px solid #1C1A18" }}>
+              className="text-cyan-400/70 text-xs border border-cyan-500/30 px-2 py-0.5 rounded">
               {loggedIn ? "🏆" : "🔐"}
             </button>
           )}
           {loggedIn ? (
             <button onClick={() => { clearAuth(); onLogout(); }}
-              className="text-xs font-bold hover:underline transition" style={{ color: "#C8C3BA" }}>
+              className="text-white/30 text-xs hover:text-white/60 transition">
               Logout
             </button>
           ) : (
@@ -1289,26 +930,27 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
         </div>
       </div>
 
-      {/* Tournament banner */}
+      {/* Tournament banner — only shown to logged-in users */}
       {loggedIn && (tournament || tournamentStatus === "none") && (
-        <div className="text-center py-1 px-2 flex-shrink-0" style={{ background: "#E8E2D6", borderBottom: "1px solid #D4CFC4" }}>
+        <div className="text-center py-1 px-2 flex-shrink-0">
           {tournament ? (
-            <span className="text-xs font-bold px-3 py-0.5 rounded" style={{
-              background: canPlay ? "#1C1A18" : tournamentStatus === "ended" ? "#fee2e2" : "#fef9c3",
-              color: canPlay ? "#EDE8DC" : tournamentStatus === "ended" ? "#b91c1c" : "#854d0e"
-            }}>
+            <span className={`text-xs font-bold px-3 py-0.5 rounded ${
+              canPlay ? "bg-cyan-500/15 text-cyan-400"
+              : tournamentStatus === "ended" ? "bg-red-500/15 text-red-400"
+              : "bg-yellow-500/15 text-yellow-400"
+            }`}>
               {canPlay ? `🟢 ${tournament.name} · ${timeLeft} left`
                 : tournamentStatus === "ended" ? `🔴 ${tournament.name} — ENDED`
                 : `⏳ ${tournament.name} — starts soon`}
             </span>
           ) : (
-            <span className="text-xs" style={{ color: "#C8C3BA" }}>No active tournament</span>
+            <span className="text-xs text-white/20">No active tournament</span>
           )}
         </div>
       )}
 
       {devtoolsWarning && (
-        <div className="mx-3 flex-shrink-0 text-center text-xs text-red-600 bg-red-50 border border-red-300 rounded py-1 px-3">
+        <div className="mx-3 flex-shrink-0 text-center text-xs text-red-400 bg-red-900/20 border border-red-500/30 rounded py-1 px-3">
           ⛔ Developer tools detected — session invalidated.
         </div>
       )}
@@ -1338,7 +980,7 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
                   {/* Left button */}
                   <button
                     className="pointer-events-auto rounded-2xl flex items-center justify-center font-black text-3xl select-none"
-                    style={{ width: 110, height: 90, background: "rgba(192,132,252,0.2)", border: "2px solid rgba(192,132,252,0.5)", color: "#c084fc", WebkitTapHighlightColor: "transparent", touchAction: "none" }}
+                    style={{ width: 110, height: 90, background: "rgba(0,180,255,0.2)", border: "2px solid rgba(0,212,255,0.5)", color: "#00d4ff", WebkitTapHighlightColor: "transparent", touchAction: "none" }}
                     onPointerDown={() => mobileLeft(true)}
                     onPointerUp={() => mobileLeft(false)}
                     onPointerLeave={() => mobileLeft(false)}
@@ -1349,7 +991,7 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
                   {/* Right button */}
                   <button
                     className="pointer-events-auto rounded-2xl flex items-center justify-center font-black text-3xl select-none"
-                    style={{ width: 110, height: 90, background: "rgba(192,132,252,0.2)", border: "2px solid rgba(192,132,252,0.5)", color: "#c084fc", WebkitTapHighlightColor: "transparent", touchAction: "none" }}
+                    style={{ width: 110, height: 90, background: "rgba(0,180,255,0.2)", border: "2px solid rgba(0,212,255,0.5)", color: "#00d4ff", WebkitTapHighlightColor: "transparent", touchAction: "none" }}
                     onPointerDown={() => mobileRight(true)}
                     onPointerUp={() => mobileRight(false)}
                     onPointerLeave={() => mobileRight(false)}
@@ -1360,140 +1002,145 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
 
               {/* Menu */}
               {gameState === "menu" && (
-                <div className="absolute inset-0 rounded-lg flex overflow-hidden" style={{ background: "#EDE8DC" }}>
-                  {/* Minara mascot — top right, like the website */}
-                  <img
-                    src="/assets/minara-mascot.png"
-                    alt="Minara"
-                    className="absolute pointer-events-none select-none"
-                    style={{ right: 0, top: 0, height: "65%", opacity: 0.85, objectFit: "contain", objectPosition: "top right" }}
-                  />
+                <div className="absolute inset-0 rounded-lg flex items-center justify-center overflow-hidden" style={overlayBg}>
+                  {/* Dark ocean overlay */}
+                  <div className="absolute inset-0 rounded-lg" style={{ background: "rgba(0,3,12,0.78)" }} />
+                  {/* Poster glow rays */}
+                  <div className="absolute inset-0 rounded-lg" style={{ background: "radial-gradient(ellipse 70% 60% at 50% 30%, rgba(0,180,255,0.10) 0%, transparent 70%)" }} />
 
-                  {/* Content */}
-                  <div className="relative z-10 w-full flex flex-col justify-between p-5 sm:p-7">
-                    {/* Top: branding */}
-                    <div>
-                      <p className="text-[10px] sm:text-xs font-bold tracking-[0.3em] mb-2" style={{ color: "#C8C3BA" }}>
-                        MINARA AI PRESENTS
-                      </p>
-                      <div className="mb-1">
-                        <span className="block font-black tracking-tight leading-none"
-                          style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(2rem, 6vw, 3.5rem)", color: "#1C1A18" }}>
-                          Zombie
-                        </span>
-                        <span className="block font-black tracking-tight leading-none"
-                          style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(2rem, 6vw, 3.5rem)", color: "#1C1A18", fontStyle: "italic" }}>
-                          Defender
-                        </span>
-                      </div>
-                      <p className="text-xs sm:text-sm mt-2" style={{ color: "#C8C3BA", maxWidth: 260 }}>
-                        Defend the AI frontier. Shoot the corrupted bots.
-                      </p>
+                  <div className="relative z-10 w-full max-w-lg mx-2 flex flex-col items-center">
+
+                    {/* ── POSTER HEADER ── */}
+                    <p className="text-[10px] sm:text-xs font-black tracking-[0.3em] mb-1" style={{ color: "rgba(0,200,255,0.55)" }}>
+                      PACIFIC POD NFT PRESENTS
+                    </p>
+                    <div className="text-center leading-none mb-0.5">
+                      <span className="block font-black tracking-[0.25em] text-4xl sm:text-5xl"
+                        style={{ color: "#00d4ff", textShadow: "0 0 40px rgba(0,212,255,0.9), 0 0 80px rgba(0,150,255,0.4)" }}>
+                        PACIFIC PODS
+                      </span>
+                      <span className="block font-black tracking-[0.15em] text-2xl sm:text-3xl text-white mt-0.5"
+                        style={{ textShadow: "0 0 20px rgba(255,255,255,0.3)" }}>
+                        ZOMBIE SHOOTER
+                      </span>
+                    </div>
+                    <div className="flex gap-1 mb-3 mt-1">
+                      {[...Array(5)].map((_, i) => <span key={i} className="text-yellow-400 text-xs">★</span>)}
                     </div>
 
-                    {/* Bottom: character select + play */}
-                    <div className="w-full max-w-sm">
-                      {/* Selected character preview */}
-                      <div className="flex items-end gap-4 mb-4">
-                        <div style={{ width: 80, height: 90, flexShrink: 0, position: "relative" }}>
-                          <img
-                            key={CHARACTERS[selectedChar].shooterSrc}
-                            src={CHARACTERS[selectedChar].shooterSrc}
-                            alt={CHARACTERS[selectedChar].name}
-                            style={{ width: "100%", height: "100%", objectFit: "contain" }}
-                          />
-                        </div>
-                        <div>
-                          <p className="text-[10px] font-bold tracking-widest uppercase mb-0.5" style={{ color: "#C8C3BA" }}>Selected</p>
-                          <p className="font-black text-base" style={{ color: "#1C1A18", fontFamily: "'Playfair Display', serif" }}>{CHARACTERS[selectedChar].name}</p>
-                        </div>
+                    {/* ── SELECTED SHOOTER PREVIEW ── */}
+                    <div className="flex justify-center items-end mb-1" style={{ height: 130 }}>
+                      <div style={{ position: "relative", width: 110, height: 130 }}>
+                        {/* glow halo behind sprite */}
+                        <div style={{
+                          position: "absolute", inset: 0,
+                          borderRadius: "50%",
+                          background: `radial-gradient(ellipse at 50% 80%, ${CHARACTERS[selectedChar].color}55 0%, transparent 70%)`,
+                          filter: "blur(8px)",
+                        }} />
+                        <img
+                          key={CHARACTERS[selectedChar].shooterSrc}
+                          src={CHARACTERS[selectedChar].shooterSrc}
+                          alt={CHARACTERS[selectedChar].name}
+                          style={{
+                            position: "relative",
+                            width: "100%", height: "100%",
+                            objectFit: "contain",
+                            filter: `drop-shadow(0 0 12px ${CHARACTERS[selectedChar].color}99)`,
+                            transition: "opacity 0.2s",
+                          }}
+                        />
                       </div>
+                    </div>
 
-                      {/* Character select grid */}
-                      <div className="rounded-xl border overflow-hidden mb-3" style={{ borderColor: "#C8C3BA", background: "#F2EDE3" }}>
-                        <p className="text-[10px] font-black tracking-widest uppercase text-center py-1.5 border-b"
-                          style={{ color: "#1C1A18", background: "#E8E2D6", borderColor: "#C8C3BA" }}>
-                          ⚡ Choose Your AI
-                        </p>
-                        <div className="flex justify-center gap-2 p-3 flex-wrap">
-                          {CHARACTERS.map((c, i) => (
-                            <button
-                              key={c.id}
-                              onClick={() => { setSelectedChar(i); selectedCharRef.current = i; }}
-                              title={c.name}
-                              className="flex flex-col items-center gap-1 transition-all"
-                              style={{ outline: "none" }}
-                            >
-                              <div className="rounded-lg overflow-hidden transition-all"
-                                style={{
-                                  width: 52, height: 52,
-                                  border: selectedChar === i ? "2.5px solid #1C1A18" : "2px solid #D4CFC4",
-                                  background: "#FFFFFF",
-                                  transform: selectedChar === i ? "scale(1.1)" : "scale(1)",
-                                  boxShadow: selectedChar === i ? "0 2px 8px rgba(28,26,24,0.18)" : "none",
-                                }}>
-                                <img src={c.src} alt={c.name} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                              </div>
-                              <span className="text-[9px] font-bold"
-                                style={{ color: selectedChar === i ? "#1C1A18" : "#C8C3BA" }}>
-                                {c.name}
-                              </span>
-                            </button>
-                          ))}
-                        </div>
+                    {/* ── CHARACTER SELECT ── */}
+                    <div className="w-full rounded-xl border mb-3 overflow-hidden"
+                      style={{ background: "rgba(0,8,20,0.85)", borderColor: "rgba(0,200,255,0.2)" }}>
+                      <p className="text-[10px] font-black tracking-widest uppercase text-center py-1.5"
+                        style={{ color: "rgba(0,200,255,0.6)", background: "rgba(0,40,70,0.5)", borderBottom: "1px solid rgba(0,200,255,0.15)" }}>
+                        ⚡ Choose Your Pod
+                      </p>
+                      <div className="flex justify-center gap-2 p-3 flex-wrap">
+                        {CHARACTERS.map((c, i) => (
+                          <button
+                            key={c.id}
+                            onClick={() => { setSelectedChar(i); selectedCharRef.current = i; }}
+                            title={c.name}
+                            className="flex flex-col items-center gap-1 transition-all"
+                            style={{ outline: "none" }}
+                          >
+                            <div className="rounded-xl overflow-hidden transition-all"
+                              style={{
+                                width: 60, height: 60,
+                                border: selectedChar === i ? `3px solid ${c.color}` : "3px solid rgba(255,255,255,0.08)",
+                                boxShadow: selectedChar === i ? `0 0 16px ${c.color}88` : "none",
+                                background: c.bg,
+                                transform: selectedChar === i ? "scale(1.12)" : "scale(1)",
+                              }}>
+                              <img
+                                src={c.src}
+                                alt={c.name}
+                                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                              />
+                            </div>
+                            <span className="text-[9px] font-bold tracking-wide"
+                              style={{ color: selectedChar === i ? c.color : "rgba(255,255,255,0.35)" }}>
+                              {c.name}
+                            </span>
+                          </button>
+                        ))}
                       </div>
+                    </div>
 
-                      {/* Controls hint */}
-                      {isMobile ? (
-                        <p className="text-[11px] mb-3" style={{ color: "#C8C3BA" }}>Hold ◀ ▶ to move · gun fires automatically</p>
-                      ) : (
-                        <p className="text-[11px] mb-3" style={{ color: "#C8C3BA" }}>
-                          <kbd className="px-1 py-0.5 rounded text-xs font-bold" style={{ background: "#E8E2D6", color: "#1C1A18", border: "1px solid #C8C3BA" }}>A</kbd>{" / "}
-                          <kbd className="px-1 py-0.5 rounded text-xs font-bold" style={{ background: "#E8E2D6", color: "#1C1A18", border: "1px solid #C8C3BA" }}>D</kbd>
-                          {" or arrows to move · "}
-                          <kbd className="px-1 py-0.5 rounded text-xs font-bold" style={{ background: "#E8E2D6", color: "#1C1A18", border: "1px solid #C8C3BA" }}>Click</kbd>
-                          {" to shoot"}
+                    {/* ── CONTROLS HINT ── */}
+                    {isMobile ? (
+                      <p className="text-white/35 text-[11px] mb-3">Hold ◀ ▶ to move · gun fires automatically</p>
+                    ) : (
+                      <p className="text-white/35 text-[11px] mb-3">
+                        <kbd className="bg-white/10 px-1 py-0.5 rounded text-white/70">A</kbd>{" / "}
+                        <kbd className="bg-white/10 px-1 py-0.5 rounded text-white/70">D</kbd>{" or arrows to move · "}
+                        <kbd className="bg-white/10 px-1 py-0.5 rounded text-white/70">Click</kbd>{" to shoot"}
+                      </p>
+                    )}
+
+                    {/* ── PLAY BUTTONS ── */}
+                    <div className="w-full flex flex-col gap-2">
+                      {loggedIn && canPlay && (
+                        <button onClick={startGame}
+                          className="font-black py-3 rounded-xl text-base tracking-widest uppercase text-black transition w-full"
+                          style={{ background: `linear-gradient(135deg, ${CHARACTERS[selectedChar].color}, #0080ff)`, boxShadow: `0 0 24px ${CHARACTERS[selectedChar].color}66` }}>
+                          ⚔️ Enter the Deep
+                        </button>
+                      )}
+                      {loggedIn && !canPlay && (
+                        <div className={`text-sm border-2 px-6 py-3 rounded-xl text-center font-black tracking-widest uppercase ${
+                          tournamentStatus === "upcoming"
+                            ? "text-yellow-300 border-yellow-400/60 bg-yellow-500/15 shadow-[0_0_18px_rgba(250,204,21,0.25)] animate-pulse"
+                            : tournamentStatus === "ended"
+                            ? "text-red-300 border-red-500/30 bg-red-900/10"
+                            : "text-white/30 border-white/10"
+                        }`}>
+                          {tournamentStatus === "upcoming"
+                            ? `⏳ ${timeLeft} until start`
+                            : tournamentStatus === "ended"
+                            ? "🏆 Tournament ended · Check the final leaderboard →"
+                            : "No active tournament"}
+                        </div>
+                      )}
+                      {!loggedIn && (
+                        <button onClick={startDemoGame}
+                          className="font-black py-2.5 rounded-xl text-sm tracking-widest uppercase border transition w-full"
+                          style={{ background: "rgba(255,255,255,0.04)", borderColor: "rgba(0,200,255,0.25)", color: "rgba(0,212,255,0.75)" }}>
+                          🎮 Play Demo
+                        </button>
+                      )}
+                      {!loggedIn && (
+                        <p className="text-white/20 text-[10px] text-center">
+                          Scores not saved ·{" "}
+                          <span className="text-cyan-500/50 cursor-pointer" onClick={() => setShowSidebar(true)}>Login</span>{" "}
+                          to compete
                         </p>
                       )}
-
-                      {/* Play buttons */}
-                      <div className="flex flex-col gap-2">
-                        {loggedIn && canPlay && (
-                          <button onClick={startGame}
-                            className="font-black py-3 rounded-lg text-sm tracking-widest uppercase transition w-full"
-                            style={{ background: "#1C1A18", color: "#EDE8DC" }}>
-                            → Launch Defense
-                          </button>
-                        )}
-                        {loggedIn && !canPlay && (
-                          <div className="text-sm px-6 py-3 rounded-lg text-center font-black tracking-widest uppercase border"
-                            style={{
-                              background: tournamentStatus === "upcoming" ? "#fef9c3" : tournamentStatus === "ended" ? "#fee2e2" : "#F2EDE3",
-                              borderColor: tournamentStatus === "upcoming" ? "#ca8a04" : tournamentStatus === "ended" ? "#dc2626" : "#C8C3BA",
-                              color: tournamentStatus === "upcoming" ? "#854d0e" : tournamentStatus === "ended" ? "#b91c1c" : "#C8C3BA",
-                            }}>
-                            {tournamentStatus === "upcoming"
-                              ? `⏳ ${timeLeft} until start`
-                              : tournamentStatus === "ended"
-                              ? "🏆 Tournament ended · Check leaderboard →"
-                              : "No active tournament"}
-                          </div>
-                        )}
-                        {!loggedIn && (
-                          <button onClick={startDemoGame}
-                            className="font-black py-2.5 rounded-lg text-sm tracking-widest uppercase border transition w-full"
-                            style={{ background: "transparent", borderColor: "#1C1A18", color: "#1C1A18" }}>
-                            🎮 Play Demo
-                          </button>
-                        )}
-                        {!loggedIn && (
-                          <p className="text-[10px] text-center" style={{ color: "#C8C3BA" }}>
-                            Scores not saved ·{" "}
-                            <span className="cursor-pointer underline" style={{ color: "#1C1A18" }} onClick={() => setShowSidebar(true)}>Login</span>
-                            {" "}to compete
-                          </p>
-                        )}
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -1501,42 +1148,42 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
 
               {/* Game Over */}
               {gameState === "over" && (
-                <div className="absolute inset-0 rounded-lg flex items-center justify-center" style={{ background: "#EDE8DC" }}>
-                  <div className="relative z-10 rounded-xl p-6 sm:p-10 text-center w-72 sm:w-80 border"
-                    style={{ background: "#F2EDE3", borderColor: tournamentEndedWhilePlaying ? "#ca8a04" : "#1C1A18", borderWidth: "1.5px" }}>
+                <div className="absolute inset-0 rounded-lg flex items-center justify-center" style={overlayBg}>
+                  <div className="absolute inset-0 rounded-lg" style={{ background: "rgba(0,0,10,0.8)" }} />
+                  <div className="relative z-10 rounded-xl p-5 sm:p-10 text-center w-72 sm:w-80 border"
+                    style={{ background: "rgba(0,5,20,0.92)", borderColor: tournamentEndedWhilePlaying ? "rgba(255,180,0,0.4)" : "rgba(255,50,50,0.35)" }}>
                     {tournamentEndedWhilePlaying ? (
-                      <h2 className="text-2xl sm:text-3xl font-black tracking-widest mb-2" style={{ fontFamily: "'Playfair Display', serif", color: "#854d0e" }}>🏆 TOURNAMENT<br/>ENDED!</h2>
+                      <h2 className="text-2xl sm:text-3xl font-black tracking-widest mb-2 text-yellow-400">🏆 TOURNAMENT<br/>ENDED!</h2>
                     ) : (
-                      <h2 className="text-3xl sm:text-4xl font-black tracking-widest mb-2" style={{ fontFamily: "'Playfair Display', serif", color: "#1C1A18" }}>Game Over</h2>
+                      <h2 className="text-3xl sm:text-4xl font-black tracking-widest mb-2 text-red-400">GAME OVER</h2>
                     )}
-                    <p className="font-black my-3" style={{ fontSize: "3.5rem", color: "#1C1A18", fontFamily: "'Playfair Display', serif" }}>{score}</p>
-                    <p className="text-sm mb-5" style={{ color: "#C8C3BA" }}>Final Score</p>
+                    <p className="text-5xl sm:text-6xl font-black text-yellow-400 my-3">{score}</p>
+                    <p className="text-white/40 text-sm mb-5">Final Score</p>
                     {devtoolsWarning && (
-                      <p className="text-red-600 text-xs mb-4 bg-red-50 border border-red-300 rounded p-2">
+                      <p className="text-red-400 text-xs mb-4 bg-red-900/20 border border-red-500/20 rounded p-2">
                         Score invalidated — DevTools detected.
                       </p>
                     )}
 
-                    {/* Score submission status */}
+                    {/* Score submission status — tournament mode only */}
                     {playMode === "tournament" && !devtoolsWarning && (
                       <div className="mb-4">
                         {submitting && (
-                          <p className="text-xs rounded px-3 py-2 animate-pulse" style={{ color: "#1C1A18", background: "#E8E2D6", border: "1px solid #C8C3BA" }}>
+                          <p className="text-cyan-400 text-xs bg-cyan-900/20 border border-cyan-500/20 rounded px-3 py-2 animate-pulse">
                             ⏳ Saving your score...
                           </p>
                         )}
                         {submitted && !submitting && (
-                          <p className="text-xs bg-green-50 border border-green-300 text-green-700 rounded px-3 py-2">
+                          <p className="text-green-400 text-xs bg-green-900/20 border border-green-500/20 rounded px-3 py-2">
                             ✅ Score saved to leaderboard!
                           </p>
                         )}
                         {submitError && !submitting && !submitted && (
-                          <div className="text-red-600 text-xs bg-red-50 border border-red-300 rounded px-3 py-2">
+                          <div className="text-red-400 text-xs bg-red-900/20 border border-red-500/20 rounded px-3 py-2">
                             <p className="mb-2">❌ {submitError}</p>
                             <button
                               onClick={autoSubmitScore}
-                              className="w-full font-bold py-1.5 rounded tracking-wider uppercase text-xs transition"
-                              style={{ background: "#1C1A18", color: "#EDE8DC" }}>
+                              className="w-full bg-red-500/20 hover:bg-red-500/30 text-red-300 font-bold py-1.5 rounded tracking-wider uppercase text-xs transition">
                               Retry Submit
                             </button>
                           </div>
@@ -1546,32 +1193,29 @@ export default function GamePage({ onLogout, loggedIn = true, onLogin }: Props) 
 
                     {playMode === "demo" ? (
                       <div className="mb-4">
-                        <p className="text-xs mb-3 rounded px-3 py-2" style={{ color: "#C8C3BA", border: "1px solid #D4CFC4" }}>
+                        <p className="text-white/40 text-xs mb-3 border border-white/10 rounded px-3 py-2">
                           🎮 Demo mode — score not saved
                         </p>
                         {!loggedIn && (
-                          <p className="text-xs mb-3" style={{ color: "#E8729A" }}>Login to compete on the leaderboard!</p>
+                          <p className="text-cyan-400/60 text-xs mb-3">Login to compete on the leaderboard!</p>
                         )}
                       </div>
                     ) : null}
                     {playMode === "demo" ? (
                       <button onClick={startDemoGame}
-                        className="w-full font-bold py-2 rounded tracking-wider uppercase text-sm transition mb-2"
-                        style={{ background: "#1C1A18", color: "#EDE8DC" }}>
+                        className="w-full bg-white/10 hover:bg-white/20 text-white font-bold py-2 rounded tracking-wider uppercase text-sm transition mb-2">
                         Play Again (Demo)
                       </button>
                     ) : (
                       canPlay && !devtoolsWarning && (
                         <button onClick={startGame}
-                          className="w-full font-bold py-2 rounded tracking-wider uppercase text-sm transition mb-2"
-                          style={{ background: "#1C1A18", color: "#EDE8DC" }}>
+                          className="w-full bg-white/10 hover:bg-white/20 text-white font-bold py-2 rounded tracking-wider uppercase text-sm transition mb-2">
                           Play Again
                         </button>
                       )
                     )}
                     <button onClick={() => { setGameState("menu"); setPlayMode(null); }}
-                      className="w-full font-bold py-1.5 rounded tracking-wider uppercase text-xs transition"
-                      style={{ background: "transparent", color: "#C8C3BA", border: "1px solid #D4CFC4" }}>
+                      className="w-full bg-white/5 hover:bg-white/10 text-white/40 font-bold py-1.5 rounded tracking-wider uppercase text-xs transition">
                       Back to Menu
                     </button>
                   </div>
